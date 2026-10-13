@@ -17,8 +17,5 @@ jobs:
           node-version: 22
       - run: npm install
       - run: npm run build
-      - name: Deploy
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: deploy
+      - name: Deploy temporary Workers preview
+        run: npx wrangler deploy --temporary
