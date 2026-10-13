@@ -21,5 +21,10 @@ jobs:
           mkdir -p public
           curl -L --fail --silent --show-error             "https://mr-handsome-concept-mijizk.v2.appdeploy.ai/resources/mr-handsome-hero.webp"             -o public/mr-handsome-hero.webp
       - run: npm run build
-      - name: Deploy temporary Workers preview
-        run: npx wrangler deploy --temporary
+      - name: Deploy to claimed Cloudflare Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: deploy
+        env:
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
