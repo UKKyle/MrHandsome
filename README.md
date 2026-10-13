@@ -16,3 +16,6 @@ npm run deploy
 ```
 
 The site is intentionally marked `noindex` and uses a PIN gate for private presentation.
+
+
+Cloudflare deployment is configured via GitHub Actions.
