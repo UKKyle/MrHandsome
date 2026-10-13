@@ -13,7 +13,7 @@ const business = {
   facebook: 'https://www.facebook.com/427863107661555/',
   googleMaps: "https://www.google.com/maps/search/?api=1&query=25+The+Green,+King's+Norton,+Birmingham+B38+8SD",
   googleEmbed: "https://www.google.com/maps?q=25+The+Green,+King's+Norton,+Birmingham+B38+8SD&output=embed",
-  heroImage: 'https://mr-handsome-concept-mijizk.v2.appdeploy.ai/resources/mr-handsome-hero.webp',
+  heroImage: '/mr-handsome-hero.webp',
   hours: [
     ['Monday', '9:30am – 7:00pm'],
     ['Tuesday', '9:30am – 7:00pm'],
