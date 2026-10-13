@@ -8,8 +8,8 @@ const business = {
   phone: '0121 448 3870',
   phoneHref: 'tel:+441214483870',
   address: "25 The Green, King's Norton, Birmingham B38 8SD",
-  rating: '5.0',
-  reviews: '276',
+  rating: 4.9,
+  reviews: 290,
   facebook: 'https://www.facebook.com/427863107661555/',
   googleMaps: "https://www.google.com/maps/search/?api=1&query=25+The+Green,+King's+Norton,+Birmingham+B38+8SD",
   googleEmbed: "https://www.google.com/maps?q=25+The+Green,+King's+Norton,+Birmingham+B38+8SD&output=embed",
@@ -39,6 +39,7 @@ const reviews = [
 ];
 
 function App() {
+  const [googleStats, setGoogleStats] = useState({ rating: business.rating, reviews: business.reviews });
   const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem('mh-preview') === '1');
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
@@ -47,6 +48,29 @@ function App() {
   useEffect(() => {
     document.title = unlocked ? 'Mr Handsome — Concept Preview' : 'Private Concept — Mr Handsome';
   }, [unlocked]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch('/api/google-profile')
+      .then(response => {
+        if (!response.ok) throw new Error('Google profile lookup failed');
+        return response.json();
+      })
+      .then(data => {
+        if (cancelled) return;
+        if (typeof data.rating === 'number' && typeof data.reviews === 'number') {
+          setGoogleStats({ rating: data.rating, reviews: data.reviews });
+        }
+      })
+      .catch(() => {
+        // Keep the verified fallback values if the live lookup is unavailable.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const unlock = (event: FormEvent) => {
     event.preventDefault();
@@ -110,8 +134,8 @@ function App() {
             <p className="hero-service-line">Haircuts · Fades · Beards · Shaves</p>
             <div className="rating-row">
               <div className="stars">{[0,1,2,3,4].map(i => <Star key={i} size={17} fill="currentColor" />)}</div>
-              <strong>{business.rating}</strong>
-              <span>{business.reviews} Google reviews</span>
+              <strong>{googleStats.rating}</strong>
+              <span>{googleStats.reviews} Google reviews</span>
             </div>
             <div className="hero-actions">
               <a className="hero-primary" href={business.phoneHref}><Phone size={16} /> Book by phone</a>
@@ -125,8 +149,8 @@ function App() {
         </section>
 
         <section className="trust-strip" aria-label="Business highlights">
-          <div><strong>{business.rating}/5</strong><span>Google rating</span></div>
-          <div><strong>{business.reviews}</strong><span>Google reviews</span></div>
+          <div><strong>{googleStats.rating}/5</strong><span>Google rating</span></div>
+          <div><strong>{googleStats.reviews}</strong><span>Google reviews</span></div>
           <div><strong>7 days</strong><span>Open every week</span></div>
           <div><strong>King's Norton</strong><span>25 The Green</span></div>
         </section>
@@ -161,10 +185,10 @@ function App() {
               <h2>A reputation already earned.</h2>
             </div>
             <div className="review-score">
-              <strong>{business.rating}</strong>
+              <strong>{googleStats.rating}</strong>
               <div>
                 <div className="stars">{[0,1,2,3,4].map(i => <Star key={i} size={18} fill="currentColor" />)}</div>
-                <span>{business.reviews} Google reviews</span>
+                <span>{googleStats.reviews} Google reviews</span>
               </div>
             </div>
           </div>
@@ -180,7 +204,7 @@ function App() {
           </div>
 
           <div className="reviews-cta">
-            <span>{business.rating} from {business.reviews} Google reviews</span>
+            <span>{googleStats.rating} from {googleStats.reviews} Google reviews</span>
             <a href={business.googleMaps} target="_blank" rel="noreferrer">View Google profile</a>
           </div>
         </section>
