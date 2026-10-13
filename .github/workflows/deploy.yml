@@ -16,6 +16,10 @@ jobs:
         with:
           node-version: 22
       - run: npm install
+      - name: Prepare hero asset
+        run: |
+          mkdir -p public
+          curl -L --fail --silent --show-error             "https://mr-handsome-concept-mijizk.v2.appdeploy.ai/resources/mr-handsome-hero.webp"             -o public/mr-handsome-hero.webp
       - run: npm run build
       - name: Deploy temporary Workers preview
         run: npx wrangler deploy --temporary
