@@ -318,7 +318,7 @@ function App() {
           <div className="reviews-head">
             <div>
               <p className="section-kicker">Customer reviews</p>
-              <h2>What customers say.</h2>
+              <h2>A reputation already earned.</h2>
             </div>
             <div className="review-score">
               <strong>{business.rating}</strong>
