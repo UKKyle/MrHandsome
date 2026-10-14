@@ -181,9 +181,9 @@ function App() {
       <main>
         <section className="hero" id="top">
           <div className="hero-copy">
-            <p className="hero-location">KING'S NORTON · BIRMINGHAM</p>
-            <h1>MR<br/>HANDSOME</h1>
-            <p className="hero-service-line">Haircuts · Fades · Beards · Shaves</p>
+            <div className="hero-top"><p className="hero-location">KING'S NORTON · BIRMINGHAM</p>
+            <h1>MR<br/>HANDSOME</h1></div>
+            <div className="hero-bottom"><p className="hero-service-line">Haircuts · Fades · Beards · Shaves</p>
             <div className="rating-row">
               <div className="stars">{[0,1,2,3,4].map(i => <Star key={i} size={17} fill="currentColor" />)}</div>
               <strong>{business.rating}</strong>
@@ -192,7 +192,7 @@ function App() {
             <div className="hero-actions">
               <a className="hero-primary" href="#booking"><CalendarDays size={16} /> Book appointment</a>
               <a className="hero-secondary" href={business.googleMaps} target="_blank" rel="noreferrer"><MapPin size={16} /> Directions</a>
-            </div>
+            </div></div>
           </div>
 
           <figure className="hero-image">
@@ -238,7 +238,7 @@ function App() {
               <div className="booking-preview-head">
                 <div><span className="booking-step">MR HANDSOME · KING'S NORTON</span><h3>Find a time that suits you.</h3></div>
               </div>
-              <div className="booking-phone-option"><span>Prefer to speak to us?</span><a href={business.phoneHref}><Phone size={15}/> {business.phone}</a></div>
+              <div className="booking-phone-option"><span>Prefer to book by phone?</span><a href={business.phoneHref} aria-label={`Call Mr Handsome on ${business.phone}`}><Phone size={16}/> <span>{business.phone}</span></a></div>
               {!slotsLoaded ? <p className="simple-booking-empty">Checking upcoming availability…</p> :
                 bookingDates.length===0 ? <div className="simple-booking-empty">
                   <CalendarDays size={27}/><p>No appointment times have been published yet.</p>
