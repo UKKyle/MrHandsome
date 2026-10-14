@@ -2,8 +2,11 @@ import React, { FormEvent, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ChevronLeft, ChevronRight, MapPin, Menu, Phone, Star, X } from 'lucide-react';
 import './styles.css';
+import heroImage from './assets/hero';
 import workImage1 from './assets/work1';
 import workImage2 from './assets/work2';
+import workImage3 from './assets/work3';
+import workImage4 from './assets/work4';
 
 const business = {
   name: 'Mr Handsome',
@@ -15,7 +18,7 @@ const business = {
   facebook: 'https://www.facebook.com/427863107661555/',
   googleMaps: "https://www.google.com/maps/search/?api=1&query=25+The+Green,+King's+Norton,+Birmingham+B38+8SD",
   googleEmbed: "https://www.google.com/maps?q=25+The+Green,+King's+Norton,+Birmingham+B38+8SD&output=embed",
-  heroImage: '/mr-handsome-hero.webp',
+  heroImage,
   hours: [
     ['Monday', '9:30am – 7:00pm'],
     ['Tuesday', '9:30am – 7:00pm'],
@@ -38,19 +41,19 @@ const services = [
 const workImages = [
   {
     src: workImage1,
-    alt: 'Recent haircut from Mr Handsome',
+    alt: 'Barber styling a finished haircut at Mr Handsome',
   },
   {
     src: workImage2,
-    alt: 'Hair and grooming work at Mr Handsome',
+    alt: 'Rear fade haircut at Mr Handsome',
   },
   {
-    src: business.heroImage,
-    alt: 'Finished haircut at Mr Handsome',
+    src: workImage3,
+    alt: 'Fade and beard finish at Mr Handsome',
   },
   {
-    src: business.heroImage,
-    alt: 'Barber styling hair inside Mr Handsome',
+    src: workImage4,
+    alt: 'Side-part haircut finished at Mr Handsome',
   },
 ];
 
