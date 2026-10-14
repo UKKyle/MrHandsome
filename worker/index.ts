@@ -37,7 +37,7 @@ async function body(request:Request):Promise<Record<string,unknown>> {
 }
 async function api(request:Request,env:Env,url:URL):Promise<Response> {
   const path=url.pathname,method=request.method;
-  if (method==='GET' && path==='/api/admin/overview') {
+  if (method==='GET' && path==='/admin/api/overview') {
     const [staff,services,hours]=await Promise.all([
       env.BOOKINGS_DB.prepare('SELECT id,display_name,active,sort_order FROM barbers ORDER BY sort_order,display_name').all(),
       env.BOOKINGS_DB.prepare('SELECT id,title,duration_minutes,buffer_minutes,active FROM services ORDER BY title').all(),
@@ -45,26 +45,26 @@ async function api(request:Request,env:Env,url:URL):Promise<Response> {
     ]);
     return json({staff:staff.results,services:services.results,hours:hours.results});
   }
-  if (method==='POST' && path==='/api/admin/staff') {
+  if (method==='POST' && path==='/admin/api/staff') {
     const b=await body(request);
     if (!validId(b.id)||!stringField(b.display_name)||typeof b.active!=='boolean') return json({error:'Invalid staff details'},400);
     await env.BOOKINGS_DB.prepare('INSERT INTO barbers(id,display_name,active) VALUES (?,?,?) ON CONFLICT(id) DO UPDATE SET display_name=excluded.display_name,active=excluded.active').bind(b.id,b.display_name.trim(),Number(b.active)).run();
     return json({ok:true});
   }
-  if (method==='POST' && path==='/api/admin/services') {
+  if (method==='POST' && path==='/admin/api/services') {
     const b=await body(request);
     if (!validId(b.id)||!stringField(b.title)||!Number.isInteger(b.duration_minutes)||Number(b.duration_minutes)<5||Number(b.duration_minutes)>240||!Number.isInteger(b.buffer_minutes)||Number(b.buffer_minutes)<0||Number(b.buffer_minutes)>120||typeof b.active!=='boolean') return json({error:'Invalid service details'},400);
     await env.BOOKINGS_DB.prepare('INSERT INTO services(id,title,duration_minutes,buffer_minutes,active) VALUES(?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,duration_minutes=excluded.duration_minutes,buffer_minutes=excluded.buffer_minutes,active=excluded.active').bind(b.id,b.title.trim(),b.duration_minutes,b.buffer_minutes,Number(b.active)).run();
     return json({ok:true});
   }
-  if (method==='POST' && path==='/api/admin/hours') {
+  if (method==='POST' && path==='/admin/api/hours') {
     const b=await body(request);
     if (!validId(b.id)||!validId(b.barber_id)||!Number.isInteger(b.weekday)||Number(b.weekday)<0||Number(b.weekday)>6||!validTime(b.starts_at)||!validTime(b.ends_at)||b.starts_at>=b.ends_at) return json({error:'Invalid working hours'},400);
     await env.BOOKINGS_DB.prepare('INSERT INTO working_hours(id,barber_id,weekday,starts_at,ends_at) VALUES(?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET barber_id=excluded.barber_id,weekday=excluded.weekday,starts_at=excluded.starts_at,ends_at=excluded.ends_at').bind(b.id,b.barber_id,b.weekday,b.starts_at,b.ends_at).run();
     return json({ok:true});
   }
-  if (method==='DELETE' && path.startsWith('/api/admin/hours/')) {
-    const id=decodeURIComponent(path.slice('/api/admin/hours/'.length));
+  if (method==='DELETE' && path.startsWith('/admin/api/hours/')) {
+    const id=decodeURIComponent(path.slice('/admin/api/hours/'.length));
     if (!validId(id)) return json({error:'Invalid ID'},400);
     await env.BOOKINGS_DB.prepare('DELETE FROM working_hours WHERE id=?').bind(id).run();
     return json({ok:true});
@@ -74,10 +74,10 @@ async function api(request:Request,env:Env,url:URL):Promise<Response> {
 export default {
  async fetch(request:Request, env:Env):Promise<Response> {
   const url=new URL(request.url);
-  const isAdmin=url.pathname==='/admin'||url.pathname.startsWith('/admin/')||url.pathname.startsWith('/api/admin/');
+  const isAdmin=url.pathname==='/admin'||url.pathname.startsWith('/admin/')||url.pathname.startsWith('/admin/api/');
   if (!isAdmin) return env.ASSETS.fetch(request);
   if (!await verifyAdmin(request,env)) return denied();
-  if (url.pathname.startsWith('/api/admin/')) {
+  if (url.pathname.startsWith('/admin/api/')) {
     if (!env.BOOKINGS_DB) return json({error:'Booking database not configured'},503);
     try {return await api(request,env,url);}
     catch(e) {return json({error:'Unable to save changes. Check for duplicate IDs or invalid references.'},400);}
