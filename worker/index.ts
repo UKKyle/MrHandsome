@@ -155,10 +155,11 @@ export default {
       if(name.length<2||name.length>80||/[<>\\x00-\\x1f]/.test(name)||typeof date!=='string'||typeof time!=='string'||input.accepted_terms!==true) return json({error:'Enter your name and accept the arrival terms'},400);
       if(!(await getSlots(env,false)).some(x=>x.date===date&&x.time===time))return json({error:'This time is no longer available. Please choose another.'},409);
       // Unique (date,time) is enforced in D1 even under simultaneous requests.
-      await env.BOOKINGS_DB.prepare(`INSERT INTO simple_bookings(date,time,customer_name) SELECT ?,?,? WHERE NOT EXISTS (
+      const result=await env.BOOKINGS_DB.prepare(`INSERT INTO simple_bookings(date,time,customer_name) SELECT ?,?,? WHERE NOT EXISTS (
         SELECT 1 FROM blocked_slots WHERE date=? AND time>=? AND time<?
       )`).bind(date,time,name,date,time,
         `${String(Math.floor((Number(time.slice(0,2))*60+Number(time.slice(3,5))+60)/60)).padStart(2,'0')}:${String((Number(time.slice(0,2))*60+Number(time.slice(3,5))+60)%60).padStart(2,'0')}`).run();
+      if(!result.meta.changes)return json({error:'This time is no longer available'},409);
       return json({ok:true,date,time});
     } catch {return json({error:'This time could not be booked. Refresh availability and try again.'},409);}
   }
