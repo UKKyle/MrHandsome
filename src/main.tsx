@@ -2,11 +2,11 @@ import React, { FormEvent, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ChevronLeft, ChevronRight, MapPin, Menu, Phone, Star, X } from 'lucide-react';
 import './styles.css';
-import heroImage from './assets/hero';
-import workImage1 from './assets/work1';
-import workImage2 from './assets/work2';
-import workImage3 from './assets/work3';
-import workImage4 from './assets/work4';
+const heroImage = '/images/hero.webp';
+const workImage1 = '/images/work-1.webp';
+const workImage2 = '/images/work-2.webp';
+const workImage3 = '/images/work-3.webp';
+const workImage4 = '/images/work-4.webp';
 
 const business = {
   name: 'Mr Handsome',
