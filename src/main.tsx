@@ -57,6 +57,15 @@ const workImages = [
   },
 ];
 
+const bookingOptions = [
+  { title: 'Haircut', duration: '30–45 min' },
+  { title: 'Skin fade', duration: '45–60 min' },
+  { title: 'Hair & beard', duration: '60 min' },
+  { title: 'Shave', duration: '30 min' },
+];
+
+const sampleTimes = ['09:30', '10:15', '11:30', '13:00', '14:45', '16:15'];
+
 const reviews = [
   ['“Always a cracking haircut here.”', 'Dan Craig'],
   ['“Great place for kids as well.”', 'Robbie Hindle'],
@@ -68,6 +77,9 @@ function App() {
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [bookingService, setBookingService] = useState(0);
+  const [bookingDay, setBookingDay] = useState(0);
+  const [bookingTime, setBookingTime] = useState<string | null>(null);
   const workReelRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -90,6 +102,12 @@ function App() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     setMenuOpen(false);
   };
+
+  const previewDays = Array.from({ length: 5 }, (_, offset) => {
+    const date = new Date();
+    date.setDate(date.getDate() + offset + 1);
+    return { label: date.toLocaleDateString('en-GB', { weekday: 'short' }), date: date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) };
+  });
 
   const moveWorkReel = (direction: -1 | 1) => {
     const reel = workReelRef.current;
@@ -194,10 +212,45 @@ function App() {
               <p className="section-kicker">Services</p>
               <h2>Cut, fade, shave.</h2>
               <p>Call the shop to check current pricing, availability and the best time to come in.</p>
-              <a className="booking-link" href={business.phoneHref}><Phone size={16} /> Book by phone</a>
+              <p className="booking-intro">Explore how a simple online appointment booking experience could work for Mr Handsome.</p>
             </div>
 
-            <div className="service-menu">
+            <div className="booking-preview" aria-label="Appointment booking concept">
+              <div className="booking-preview-head">
+                <div><span className="booking-step">APPOINTMENT PREVIEW</span><h3>Find your next appointment.</h3></div>
+                <span className="booking-demo">Concept only</span>
+              </div>
+              <div className="booking-field-label"><span>01</span> Choose a service</div>
+              <div className="booking-service-options">
+                {bookingOptions.map((option, index) => (
+                  <button type="button" key={option.title} className={bookingService === index ? 'selected' : ''} aria-pressed={bookingService === index} onClick={() => { setBookingService(index); setBookingTime(null); }}>
+                    <strong>{option.title}</strong><small>{option.duration}</small>
+                  </button>
+                ))}
+              </div>
+              <div className="booking-field-label"><span>02</span> Preferred day</div>
+              <div className="booking-day-options">
+                {previewDays.map((day, index) => (
+                  <button type="button" key={day.date} className={bookingDay === index ? 'selected' : ''} aria-pressed={bookingDay === index} onClick={() => { setBookingDay(index); setBookingTime(null); }}>
+                    <span>{day.label}</span><strong>{day.date}</strong>
+                  </button>
+                ))}
+              </div>
+              <div className="booking-field-label"><span>03</span> Preferred time</div>
+              <div className="booking-time-options">
+                {sampleTimes.map(time => (
+                  <button type="button" key={time} aria-pressed={bookingTime === time} className={bookingTime === time ? 'selected' : ''} onClick={() => setBookingTime(time)}>{time}</button>
+                ))}
+              </div>
+              <div className="booking-preview-foot">
+                <p>Illustrative times only — live availability and online reservations are not connected yet.</p>
+                <a className="booking-enquire" href={business.phoneHref}><Phone size={16}/> {bookingTime ? 'Call to request this time' : 'Enquire by phone'}</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="service-details" aria-label="Barber services"><div className="service-menu">
               {services.map(([title, description], index) => (
                 <article className="service-line" key={title}>
                   <span>{String(index + 1).padStart(2, '0')}</span>
@@ -208,7 +261,7 @@ function App() {
                 </article>
               ))}
             </div>
-          </div>
+          </div></div>
         </section>
 
         <section className="work-showcase" id="work">
