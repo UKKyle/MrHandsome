@@ -261,7 +261,6 @@ function App() {
                 </article>
               ))}
             </div>
-          </div></div>
         </section>
 
         <section className="work-showcase" id="work">
