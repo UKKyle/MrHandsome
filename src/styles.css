@@ -250,3 +250,22 @@
   .hero-copy .rating-row{margin-top:21px}
   .hero-copy .hero-actions{margin-top:27px}
 }
+
+/* Customer experience polish: consistent selection, clear summary, reliable tablet CTA. */
+.services .booking-selection-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:15px 17px;background:#30271f;border:1px solid #7b6043;border-radius:8px}
+.services .booking-selection-summary span{color:#c4b3a1;font-size:12px}
+.services .booking-selection-summary strong{font-size:14px;color:#f2e6d7}
+.services .booking-privacy a,.services .booking-privacy a:visited{color:#e5bb86;text-decoration:underline;text-underline-offset:3px}
+.services .simple-booking .booking-preview-head h3{letter-spacing:-.025em}
+.services .simple-booking-days button,.services .simple-booking-times button{outline-offset:3px}
+.services .simple-booking-form input:focus-visible,.services .booking-agreement input:focus-visible{outline:2px solid #c8a476;outline-offset:3px}
+.services .simple-booking-empty{line-height:1.6}
+@media(min-width:601px) and (max-width:760px){
+  body{padding-bottom:66px}
+  .mobile-actions{position:fixed;left:0;right:0;bottom:0;z-index:50;display:grid;grid-template-columns:1fr 1fr;height:66px;background:#0d0d0c;border-top:1px solid var(--line);box-shadow:0 -10px 30px rgba(0,0,0,.28)}
+  .mobile-actions a{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--cream);text-decoration:none;font-size:13px;font-weight:800}
+  .mobile-actions a:first-child{background:var(--brass);color:#17120f}
+  .mobile-actions a+a{border-left:1px solid var(--line)}
+}
+@media(max-width:760px){.services .simple-booking{scroll-margin-top:84px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.work-card img{transition:none}.trust-item,.hero-primary,.hero-secondary{transition:none}}
