@@ -1,6 +1,6 @@
 import React, { FormEvent, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { MapPin, Menu, Phone, Star, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin, Menu, Phone, Star, X } from 'lucide-react';
 import './styles.css';
 
 const business = {
@@ -32,6 +32,26 @@ const services = [
   ['Wet & dry shave', 'Traditional shaving options for a clean finish.'],
 ];
 
+
+const workImages = [
+  {
+    src: 'https://images.openai.com/static-rsc-1/yzEJps6r_AbitFLxO6tWLnGdvGtuk_AFXg-jAq722aYlKEP0RGudtXZuzolcYm4ZSwTCDjBZkQWCWmjqFZB6ZY9wabt1mwf36djR4vGIl1AQACDXw6hksxlxeJub85uRauZ4pY3hqVgUGfjuYVHseFWT-ieSZp67_PPeEO4OcDE',
+    alt: 'Recent haircut from Mr Handsome',
+  },
+  {
+    src: 'https://images.openai.com/static-rsc-1/9frvWOEsgNfE_WZCruUHPw27RKIas3fWYwdlZYl9vPsRZ7-9BjM-1uZlP9ZLvUuO0ewzUy-Js1KGAFgVurUTRodb9HkcFNWB8RGHbIK8wMaF1zEbq8CvgQr3f2P8Nu_52VeSxANiCZZwzxgTPqKi8hTYEce579hkfb2lLEK_aU8',
+    alt: 'Hair and grooming work at Mr Handsome',
+  },
+  {
+    src: 'https://images.openai.com/static-rsc-1/uWzK4sh6qR9u8UGP5QLp_k5LQX2wXBIQsFgd2HWEnOnlc0kPsF9r9lsXLQ8XRLS8Fm5oXwAzICSxtd8i1QqIfOvvTLEG1IKnme_iWa2VNxDd2PTjD_cFRAVSzDTEh9UDMoMfOTqJ8q0HpYLsKr2VejOlHHqXI9uQl58hkJ5N1KY',
+    alt: 'Finished haircut at Mr Handsome',
+  },
+  {
+    src: business.heroImage,
+    alt: 'Barber styling hair inside Mr Handsome',
+  },
+];
+
 const reviews = [
   ['“Always a cracking haircut here.”', 'Dan Craig'],
   ['“Great place for kids as well.”', 'Robbie Hindle'],
@@ -43,6 +63,7 @@ function App() {
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
+  const workReelRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     document.title = unlocked ? 'Mr Handsome — Concept Preview' : 'Private Concept — Mr Handsome';
@@ -63,6 +84,16 @@ function App() {
   const go = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     setMenuOpen(false);
+  };
+
+  const moveWorkReel = (direction: -1 | 1) => {
+    const reel = workReelRef.current;
+    if (!reel) return;
+    const card = reel.querySelector<HTMLElement>('.work-card');
+    reel.scrollBy({
+      left: (card?.offsetWidth ?? 420) * direction + 18 * direction,
+      behavior: 'smooth',
+    });
   };
 
   if (!unlocked) {
@@ -152,6 +183,31 @@ function App() {
                 </article>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="work-showcase" id="work">
+          <div className="work-head">
+            <div>
+              <p className="section-kicker">Recent work</p>
+              <h2>Fresh from the chair.</h2>
+            </div>
+            <div className="work-controls" aria-label="Browse recent work">
+              <button type="button" onClick={() => moveWorkReel(-1)} aria-label="Previous image">
+                <ChevronLeft size={20} />
+              </button>
+              <button type="button" onClick={() => moveWorkReel(1)} aria-label="Next image">
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          </div>
+
+          <div className="work-reel" ref={workReelRef}>
+            {workImages.map((image, index) => (
+              <figure className="work-card" key={image.src}>
+                <img src={image.src} alt={image.alt} loading={index === 0 ? 'eager' : 'lazy'} />
+              </figure>
+            ))}
           </div>
         </section>
 
