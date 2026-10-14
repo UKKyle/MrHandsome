@@ -10,7 +10,8 @@
       "/admin",
       "/admin/*",
       "/api/admin/*",
-      "/api/slots"
+      "/api/slots",
+      "/api/bookings"
     ]
   },
   "main": "./worker/index.ts",
