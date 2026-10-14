@@ -2,6 +2,8 @@ import React, { FormEvent, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ChevronLeft, ChevronRight, MapPin, Menu, Phone, Star, X } from 'lucide-react';
 import './styles.css';
+import workImage1 from './assets/work1';
+import workImage2 from './assets/work2';
 
 const business = {
   name: 'Mr Handsome',
@@ -35,15 +37,15 @@ const services = [
 
 const workImages = [
   {
-    src: 'https://images.openai.com/static-rsc-1/yzEJps6r_AbitFLxO6tWLnGdvGtuk_AFXg-jAq722aYlKEP0RGudtXZuzolcYm4ZSwTCDjBZkQWCWmjqFZB6ZY9wabt1mwf36djR4vGIl1AQACDXw6hksxlxeJub85uRauZ4pY3hqVgUGfjuYVHseFWT-ieSZp67_PPeEO4OcDE',
+    src: workImage1,
     alt: 'Recent haircut from Mr Handsome',
   },
   {
-    src: 'https://images.openai.com/static-rsc-1/9frvWOEsgNfE_WZCruUHPw27RKIas3fWYwdlZYl9vPsRZ7-9BjM-1uZlP9ZLvUuO0ewzUy-Js1KGAFgVurUTRodb9HkcFNWB8RGHbIK8wMaF1zEbq8CvgQr3f2P8Nu_52VeSxANiCZZwzxgTPqKi8hTYEce579hkfb2lLEK_aU8',
+    src: workImage2,
     alt: 'Hair and grooming work at Mr Handsome',
   },
   {
-    src: 'https://images.openai.com/static-rsc-1/uWzK4sh6qR9u8UGP5QLp_k5LQX2wXBIQsFgd2HWEnOnlc0kPsF9r9lsXLQ8XRLS8Fm5oXwAzICSxtd8i1QqIfOvvTLEG1IKnme_iWa2VNxDd2PTjD_cFRAVSzDTEh9UDMoMfOTqJ8q0HpYLsKr2VejOlHHqXI9uQl58hkJ5N1KY',
+    src: business.heroImage,
     alt: 'Finished haircut at Mr Handsome',
   },
   {
