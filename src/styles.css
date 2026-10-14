@@ -134,26 +134,26 @@
 .booking-demo{flex:none;font-size:10px;color:#baae9f;border:1px solid #66503c;padding:7px 9px}
 .booking-field-label{display:flex;align-items:center;gap:11px;margin:26px 0 13px;color:#e5d8c8}
 .booking-field-label>span{color:#bd9360}
-.booking-service-options,.booking-day-options,.booking-time-options{display:grid;gap:8px}
-.booking-service-options{grid-template-columns:repeat(2,minmax(0,1fr))}
-.booking-day-options{grid-template-columns:repeat(5,minmax(0,1fr))}
-.booking-time-options{grid-template-columns:repeat(3,minmax(0,1fr))}
+
+
+
+
 .booking-preview button{min-width:0;cursor:pointer;border:1px solid rgba(238,231,221,.18);background:#1a1613;color:#eee7dd;transition:background .15s,border-color .15s;text-align:left}
 .booking-preview button:hover{border-color:#bd9360}
 .booking-preview button:focus-visible{outline:2px solid #d6b07d;outline-offset:2px}
 .booking-preview button.selected{border-color:#bd9360;background:#392b20}
-.booking-service-options button{padding:13px 12px;display:flex;flex-direction:column;gap:5px}
-.booking-service-options strong{font-size:13px}
-.booking-service-options small{font-size:11px;color:#b3a699}
-.booking-day-options button{padding:12px 5px;text-align:center;display:flex;flex-direction:column;gap:5px}
-.booking-day-options span{font-size:11px;color:#b3a699}
-.booking-day-options strong{font-size:12px}
-.booking-time-options button{padding:12px 8px;text-align:center;font-size:13px}
+
+
+
+
+
+
+
 .booking-preview-foot{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:29px;padding-top:23px;border-top:1px solid var(--line)}
 .booking-preview-foot p{max-width:290px;margin:0;font-size:11px;line-height:1.6;color:#b3a699}
 .booking-enquire{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:11px 16px;background:var(--brass);color:#17120f;text-decoration:none;font-size:12px;font-weight:800;text-align:center}
-.service-details{background:#191512;padding:0 6vw 76px}
-.service-details>.service-menu{max-width:1240px;margin:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:65px}
+
+
 @media(max-width:900px){.services-shell{grid-template-columns:1fr}.service-details>.service-menu{grid-template-columns:1fr}}
 @media(max-width:600px){.booking-preview{padding:21px 16px;margin:0 -2px}.booking-preview-head h3{font-size:28px}.booking-service-options{grid-template-columns:repeat(2,minmax(0,1fr))}.booking-day-options{gap:5px}.booking-day-options button{padding:10px 3px}.booking-day-options strong{font-size:10px}.booking-day-options span{font-size:10px}.booking-preview-foot{display:block}.booking-preview-foot p{max-width:none}.booking-enquire{display:none}.service-details{padding:0 20px 54px}}
 
@@ -269,3 +269,25 @@
 }
 @media(max-width:760px){.services .simple-booking{scroll-margin-top:84px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.work-card img{transition:none}.trust-item,.hero-primary,.hero-secondary{transition:none}}
+
+/* P1 customer booking rhythm — maintain the existing aesthetic. */
+@media(min-width:901px){
+ .services-shell{grid-template-columns:minmax(220px,.62fr) minmax(0,1.38fr);gap:clamp(38px,5vw,85px);align-items:start}
+ .services-copy{padding-top:25px}
+ .services-copy h2{max-width:360px}
+ .services .simple-booking{padding:clamp(30px,3vw,42px)}
+}
+.services .simple-booking .booking-preview-head{padding-bottom:20px}
+.services .simple-booking .booking-phone-option{margin:17px 0 8px!important}
+.services .simple-booking .simple-booking-label{margin:25px 0 12px}
+.services .booking-success{border-radius:9px}
+@media(max-width:900px){
+ .services-shell{gap:26px}
+ .services-copy>p{margin-top:15px}
+}
+@media(max-width:600px){
+ .services .simple-booking{padding:22px 17px}
+ .services .simple-booking-days{scroll-snap-type:x proximity}
+ .services .simple-booking-days button{scroll-snap-align:start}
+ .services .simple-booking-times button{min-height:52px}
+}
