@@ -72,6 +72,11 @@ function App() {
   const [slotsLoaded, setSlotsLoaded] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [bookingTime, setBookingTime] = useState<string | null>(null);
+  const [customerName, setCustomerName] = useState('');
+  const [acceptedArrivalTerms, setAcceptedArrivalTerms] = useState(false);
+  const [bookingSubmitting, setBookingSubmitting] = useState(false);
+  const [bookingError, setBookingError] = useState('');
+  const [bookingConfirmation, setBookingConfirmation] = useState<{date:string;time:string;name:string}|null>(null);
   const workReelRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -109,6 +114,21 @@ function App() {
   }, []);
   const bookingDates=[...new Set(availableSlots.map(slot=>slot.date))];
   const visibleTimes=availableSlots.filter(slot=>slot.date===(selectedDate ?? bookingDates[0]));
+
+  const confirmBooking = async (event:FormEvent) => {
+    event.preventDefault();
+    if(!selectedDate || !bookingTime || !acceptedArrivalTerms || customerName.trim().length<2) return;
+    setBookingSubmitting(true);setBookingError('');
+    try {
+      const res=await fetch('/api/bookings',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({date:selectedDate,time:bookingTime,name:customerName.trim(),accepted_terms:true})});
+      const data=await res.json();
+      if(!res.ok)throw new Error(data.error||'Unable to reserve appointment');
+      setBookingConfirmation({date:selectedDate,time:bookingTime,name:customerName.trim()});
+      setAvailableSlots(old=>old.filter(x=>!(x.date===selectedDate&&x.time===bookingTime)));
+      setBookingTime(null);setCustomerName('');setAcceptedArrivalTerms(false);
+    }catch(e){setBookingError(e instanceof Error?e.message:'Unable to book. Please try again.');}
+    finally{setBookingSubmitting(false);}
+  };
 
   const moveWorkReel = (direction: -1 | 1) => {
     const reel = workReelRef.current;
@@ -212,7 +232,7 @@ function App() {
             <div className="services-copy">
               <p className="section-kicker">Appointments</p>
               <h2>Your next visit, made simple.</h2>
-              <p>Choose an available day and time below. Call the shop to arrange your visit.</p>
+              <p>Choose a day and time, enter your name, and book your appointment.</p>
             </div>
             <div className="booking-preview simple-booking" aria-label="Upcoming appointment availability">
               <div className="booking-preview-head">
@@ -236,10 +256,24 @@ function App() {
                   </div>
                 </>
               }
-              <div className="simple-booking-footer">
-                <span>{bookingTime?'Selected: '+bookingTime+' · Please confirm by phone':'Times are managed by the shop. Bookings require confirmation.'}</span>
-                <a href={business.phoneHref}><Phone size={16}/> Call to book</a>
-              </div>
+              {bookingConfirmation ? <div className="booking-success" role="status">
+                <div className="booking-success-icon">✓</div>
+                <h4>You're booked in.</h4>
+                <p>{bookingConfirmation.name} · {new Date(bookingConfirmation.date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})} at {bookingConfirmation.time}</p>
+                <p>Please arrive on time. No email or text confirmation is sent, so keep a note of your appointment.</p>
+                <button type="button" onClick={()=>setBookingConfirmation(null)}>Book another appointment</button>
+              </div> : <form className="simple-booking-form" onSubmit={confirmBooking}>
+                <label htmlFor="customer-booking-name">Your name</label>
+                <input id="customer-booking-name" value={customerName} onChange={e=>setCustomerName(e.target.value)} placeholder="Full name" autoComplete="name" maxLength={80} minLength={2} required/>
+                <label className="booking-agreement">
+                  <input type="checkbox" checked={acceptedArrivalTerms} onChange={e=>setAcceptedArrivalTerms(e.target.checked)} required/>
+                  <span>I understand that if I arrive late or miss my appointment, the barber may be unable to complete my service and may ask me to wait for the next available walk-in opportunity.</span>
+                </label>
+                {bookingError&&<p className="booking-form-error" role="alert">{bookingError}</p>}
+                <button className="booking-submit" type="submit" disabled={!bookingTime||!acceptedArrivalTerms||customerName.trim().length<2||bookingSubmitting}>{bookingSubmitting?'Booking…':'Confirm appointment'}</button>
+                <p className="booking-privacy">Only your name and appointment time are recorded. Please arrive on time.</p>
+              </form>}
+
             </div>
           </div>
         </section>
