@@ -100,17 +100,25 @@ function App() {
     setMenuOpen(false);
   };
 
+  const refreshSlots = async () => {
+    const response = await fetch('/api/slots', {cache:'no-store'});
+    if (!response.ok) throw new Error('Unable to refresh appointments');
+    const data:{slots:{date:string;time:string}[]} = await response.json();
+    const slots=Array.isArray(data.slots)?data.slots:[];
+    setAvailableSlots(slots);
+    setSelectedDate(previous=>previous && slots.some(item=>item.date===previous)?previous:(slots[0]?.date??null));
+    setBookingTime(null);
+    setSlotsLoaded(true);
+    return slots;
+  };
   useEffect(() => {
-    const controller = new AbortController();
-    fetch('/api/slots', {signal:controller.signal,cache:'no-store'})
-      .then(response => { if (!response.ok) throw new Error('Unavailable'); return response.json(); })
-      .then((data:{slots:{date:string;time:string}[]}) => {
-        const slots=Array.isArray(data.slots)?data.slots:[];
-        setAvailableSlots(slots);
-        setSelectedDate(slots[0]?.date ?? null);
-        setSlotsLoaded(true);
-      }).catch(() => { if (!controller.signal.aborted) setSlotsLoaded(true); });
-    return () => controller.abort();
+    let active=true;
+    const update=async()=>{try{if(active)await refreshSlots();}catch{if(active)setSlotsLoaded(true);}};
+    void update();
+    const interval=window.setInterval(()=>{if(document.visibilityState==='visible')void update();},60000);
+    const onFocus=()=>void update();
+    window.addEventListener('focus',onFocus);
+    return ()=>{active=false;window.clearInterval(interval);window.removeEventListener('focus',onFocus);};
   }, []);
   const bookingDates=[...new Set(availableSlots.map(slot=>slot.date))];
   const visibleTimes=availableSlots.filter(slot=>slot.date===(selectedDate ?? bookingDates[0]));
@@ -126,7 +134,7 @@ function App() {
       setBookingConfirmation({date:selectedDate,time:bookingTime,name:customerName.trim()});
       setAvailableSlots(old=>old.filter(x=>!(x.date===selectedDate&&x.time===bookingTime)));
       setBookingTime(null);setCustomerName('');setAcceptedArrivalTerms(false);
-    }catch(e){setBookingError(e instanceof Error?e.message:'Unable to book. Please try again.');}
+    }catch(e){setBookingError(e instanceof Error?e.message:'Unable to book. Please try again.');try{await refreshSlots();}catch{ /* Keep the error visible if refresh fails. */ }}
     finally{setBookingSubmitting(false);}
   };
 
@@ -251,7 +259,7 @@ function App() {
                       <strong>{new Date(date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</strong>
                     </button>)}
                   </div>
-                  <p className="simple-booking-label">Available times</p>
+                  <p className="simple-booking-label">Available times · 60-minute appointments</p>
                   <div className="simple-booking-times">
                     {visibleTimes.map(slot=><button type="button" key={slot.time} className={bookingTime===slot.time?'selected':''} aria-pressed={bookingTime===slot.time} onClick={()=>setBookingTime(slot.time)}>{slot.time}</button>)}
                   </div>
@@ -264,6 +272,7 @@ function App() {
                 <p>Please arrive on time. No email or text confirmation is sent, so keep a note of your appointment.</p>
                 <button type="button" onClick={()=>setBookingConfirmation(null)}>Book another appointment</button>
               </div> : <form className="simple-booking-form" onSubmit={confirmBooking}>
+                {bookingTime && selectedDate && <div className="booking-selection-summary"><span>Your appointment</span><strong>{new Date(selectedDate+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long'})} · {bookingTime}</strong></div>}
                 <label htmlFor="customer-booking-name">Your name</label>
                 <input id="customer-booking-name" value={customerName} onChange={e=>setCustomerName(e.target.value)} placeholder="Full name" autoComplete="name" maxLength={80} minLength={2} required/>
                 <label className="booking-agreement">
@@ -272,7 +281,7 @@ function App() {
                 </label>
                 {bookingError&&<p className="booking-form-error" role="alert">{bookingError}</p>}
                 <button className="booking-submit" type="submit" disabled={!bookingTime||!acceptedArrivalTerms||customerName.trim().length<2||bookingSubmitting}>{bookingSubmitting?'Booking…':'Confirm appointment'}</button>
-                <p className="booking-privacy">Only your name and appointment time are recorded. Please arrive on time.</p>
+                <p className="booking-privacy">Your name and appointment are stored so the shop can manage your booking. To ask about your information or cancel, call <a href={business.phoneHref}>{business.phone}</a>. No email or SMS is sent.</p>
               </form>}
 
             </div>
