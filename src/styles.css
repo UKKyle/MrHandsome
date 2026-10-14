@@ -174,3 +174,19 @@
 .simple-booking-footer span{max-width:250px;color:#ada093;font-size:11px;line-height:1.5}
 .simple-booking-footer a{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 15px;background:var(--brass);color:#1a120d;text-decoration:none;font-size:12px;font-weight:800;white-space:nowrap}
 @media(max-width:600px){.simple-booking-days button{flex-basis:75px}.simple-booking-footer{flex-direction:column;align-items:stretch;text-align:center}.simple-booking-footer span{max-width:none}.simple-booking-footer a{min-height:48px}}
+
+/* Name-only booking checkout */
+.simple-booking-form{display:grid;gap:12px;margin-top:26px;padding-top:24px;border-top:1px solid rgba(238,231,221,.16)}
+.simple-booking-form>label:not(.booking-agreement){font-size:12px;font-weight:700;color:#e0d1c0}
+.simple-booking-form>input{width:100%;background:#171310;border:1px solid #63503d;color:#fff;min-height:48px;padding:12px 14px;font-size:15px}
+.booking-agreement{display:flex;gap:12px;align-items:flex-start;font-size:12px;line-height:1.6;color:#c5b7a8;cursor:pointer}
+.booking-agreement input{flex:0 0 17px;width:17px;height:17px;accent-color:#bd9360;margin:2px 0 0}
+.booking-submit{display:flex;justify-content:center;align-items:center;min-height:49px;border:0;background:#bd9360;color:#18110b;font-size:13px;font-weight:800;cursor:pointer}
+.booking-submit:disabled{opacity:.45;cursor:not-allowed}
+.simple-booking-form .booking-privacy{font-size:11px;line-height:1.5;color:#b6a99c;margin:0}
+.booking-form-error{color:#ffb7a9;font-size:12px;margin:0}
+.booking-success{margin-top:24px;text-align:center;padding:24px 10px;border:1px solid #756346;background:#2d261c}
+.booking-success-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:#bd9360;color:#1a120d;font-weight:bold;font-size:26px;margin:0 auto 15px}
+.booking-success h4{font-family:Georgia,serif;font-size:26px;font-weight:400;margin:0 0 12px}
+.booking-success p{font-size:13px;color:#e3d8c9;line-height:1.6}
+.booking-success button{margin-top:10px;background:transparent;color:#e7c797;border:1px solid #aa885c;padding:12px 20px;cursor:pointer}
