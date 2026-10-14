@@ -57,15 +57,6 @@ const workImages = [
   },
 ];
 
-const bookingOptions = [
-  { title: 'Haircut', duration: '30–45 min' },
-  { title: 'Skin fade', duration: '45–60 min' },
-  { title: 'Hair & beard', duration: '60 min' },
-  { title: 'Shave', duration: '30 min' },
-];
-
-const sampleTimes = ['09:30', '10:15', '11:30', '13:00', '14:45', '16:15'];
-
 const reviews = [
   ['“Always a cracking haircut here.”', 'Dan Craig'],
   ['“Great place for kids as well.”', 'Robbie Hindle'],
@@ -77,8 +68,9 @@ function App() {
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
-  const [bookingService, setBookingService] = useState(0);
-  const [bookingDay, setBookingDay] = useState(0);
+  const [availableSlots, setAvailableSlots] = useState<{date:string;time:string}[]>([]);
+  const [slotsLoaded, setSlotsLoaded] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [bookingTime, setBookingTime] = useState<string | null>(null);
   const workReelRef = React.useRef<HTMLDivElement>(null);
 
@@ -103,11 +95,20 @@ function App() {
     setMenuOpen(false);
   };
 
-  const previewDays = Array.from({ length: 5 }, (_, offset) => {
-    const date = new Date();
-    date.setDate(date.getDate() + offset + 1);
-    return { label: date.toLocaleDateString('en-GB', { weekday: 'short' }), date: date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) };
-  });
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch('/api/slots', {signal:controller.signal,cache:'no-store'})
+      .then(response => { if (!response.ok) throw new Error('Unavailable'); return response.json(); })
+      .then((data:{slots:{date:string;time:string}[]}) => {
+        const slots=Array.isArray(data.slots)?data.slots:[];
+        setAvailableSlots(slots);
+        setSelectedDate(slots[0]?.date ?? null);
+        setSlotsLoaded(true);
+      }).catch(() => { if (!controller.signal.aborted) setSlotsLoaded(true); });
+    return () => controller.abort();
+  }, []);
+  const bookingDates=[...new Set(availableSlots.map(slot=>slot.date))];
+  const visibleTimes=availableSlots.filter(slot=>slot.date===(selectedDate ?? bookingDates[0]));
 
   const moveWorkReel = (direction: -1 | 1) => {
     const reel = workReelRef.current;
@@ -209,42 +210,35 @@ function App() {
         <section className="services" id="services">
           <div className="services-shell">
             <div className="services-copy">
-              <p className="section-kicker">Services</p>
-              <h2>Cut, fade, shave.</h2>
-              <p>Call the shop to check current pricing, availability and the best time to come in.</p>
-              <p className="booking-intro">Explore how a simple online appointment booking experience could work for Mr Handsome.</p>
+              <p className="section-kicker">Appointments</p>
+              <h2>Your next visit, made simple.</h2>
+              <p>Choose an available day and time below. Call the shop to arrange your visit.</p>
             </div>
-
-            <div className="booking-preview" aria-label="Appointment booking concept">
+            <div className="booking-preview simple-booking" aria-label="Upcoming appointment availability">
               <div className="booking-preview-head">
-                <div><span className="booking-step">APPOINTMENT PREVIEW</span><h3>Find your next appointment.</h3></div>
-                <span className="booking-demo">Concept only</span>
+                <div><span className="booking-step">MR HANDSOME · KING'S NORTON</span><h3>Find a time that suits you.</h3></div>
               </div>
-              <div className="booking-field-label"><span>01</span> Choose a service</div>
-              <div className="booking-service-options">
-                {bookingOptions.map((option, index) => (
-                  <button type="button" key={option.title} className={bookingService === index ? 'selected' : ''} aria-pressed={bookingService === index} onClick={() => { setBookingService(index); setBookingTime(null); }}>
-                    <strong>{option.title}</strong><small>{option.duration}</small>
-                  </button>
-                ))}
-              </div>
-              <div className="booking-field-label"><span>02</span> Preferred day</div>
-              <div className="booking-day-options">
-                {previewDays.map((day, index) => (
-                  <button type="button" key={day.date} className={bookingDay === index ? 'selected' : ''} aria-pressed={bookingDay === index} onClick={() => { setBookingDay(index); setBookingTime(null); }}>
-                    <span>{day.label}</span><strong>{day.date}</strong>
-                  </button>
-                ))}
-              </div>
-              <div className="booking-field-label"><span>03</span> Preferred time</div>
-              <div className="booking-time-options">
-                {sampleTimes.map(time => (
-                  <button type="button" key={time} aria-pressed={bookingTime === time} className={bookingTime === time ? 'selected' : ''} onClick={() => setBookingTime(time)}>{time}</button>
-                ))}
-              </div>
-              <div className="booking-preview-foot">
-                <p>Illustrative times only — live availability and online reservations are not connected yet.</p>
-                <a className="booking-enquire" href={business.phoneHref}><Phone size={16}/> {bookingTime ? 'Call to request this time' : 'Enquire by phone'}</a>
+              {!slotsLoaded ? <p className="simple-booking-empty">Checking upcoming availability…</p> :
+                bookingDates.length===0 ? <div className="simple-booking-empty">
+                  <CalendarDays size={27}/><p>No appointment times have been published yet.</p>
+                  <p>Please contact the shop for the next available appointment.</p>
+                </div> : <>
+                  <p className="simple-booking-label">Choose a day</p>
+                  <div className="simple-booking-days">
+                    {bookingDates.map(date=><button type="button" key={date} className={date===(selectedDate??bookingDates[0])?'selected':''} aria-pressed={date===(selectedDate??bookingDates[0])} onClick={()=>{setSelectedDate(date);setBookingTime(null);}}>
+                      <span>{new Date(date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short'})}</span>
+                      <strong>{new Date(date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</strong>
+                    </button>)}
+                  </div>
+                  <p className="simple-booking-label">Available times</p>
+                  <div className="simple-booking-times">
+                    {visibleTimes.map(slot=><button type="button" key={slot.time} className={bookingTime===slot.time?'selected':''} aria-pressed={bookingTime===slot.time} onClick={()=>setBookingTime(slot.time)}>{slot.time}</button>)}
+                  </div>
+                </>
+              }
+              <div className="simple-booking-footer">
+                <span>{bookingTime?'Selected: '+bookingTime+' · Please confirm by phone':'Times are managed by the shop. Bookings require confirmation.'}</span>
+                <a href={business.phoneHref}><Phone size={16}/> Call to book</a>
               </div>
             </div>
           </div>
