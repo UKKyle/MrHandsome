@@ -150,9 +150,9 @@ export default {
     try {
       if(request.headers.get('content-type')?.split(';')[0]!=='application/json')return json({error:'Invalid request'},415);
       const input=await body(request);
-      const name=typeof input.name==='string'?input.name.trim().replace(/\\s+/g,' '):'';
+      const name=typeof input.name==='string'?input.name.trim().replace(/\s+/g,' '):'';
       const date=input.date,time=input.time;
-      if(name.length<2||name.length>80||/[<>\\x00-\\x1f]/.test(name)||typeof date!=='string'||typeof time!=='string'||input.accepted_terms!==true) return json({error:'Enter your name and accept the arrival terms'},400);
+      if(name.length<2||name.length>80||/[<>\x00-\x1f]/.test(name)||typeof date!=='string'||typeof time!=='string'||input.accepted_terms!==true) return json({error:'Enter your name and accept the arrival terms'},400);
       if(!(await getSlots(env,false)).some(x=>x.date===date&&x.time===time))return json({error:'This time is no longer available. Please choose another.'},409);
       // Unique (date,time) is enforced in D1 even under simultaneous requests.
       const result=await env.BOOKINGS_DB.prepare(`INSERT INTO simple_bookings(date,time,customer_name) SELECT ?,?,? WHERE NOT EXISTS (
