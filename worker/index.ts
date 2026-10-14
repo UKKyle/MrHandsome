@@ -37,6 +37,24 @@ async function body(request:Request):Promise<Record<string,unknown>> {
 }
 async function api(request:Request,env:Env,url:URL):Promise<Response> {
   const path=url.pathname,method=request.method;
+  if (method==='GET' && path==='/admin/api/slots') {
+    const slots=await env.BOOKINGS_DB.prepare('SELECT date,time FROM available_slots WHERE date>=? ORDER BY date,time LIMIT 500').bind(new Date().toISOString().slice(0,10)).all();
+    return json({slots:slots.results});
+  }
+  if (method==='POST' && path==='/admin/api/slots') {
+    const b=await body(request);
+    if (typeof b.date!=='string'||!/^\\d{4}-\\d{2}-\\d{2}$/.test(b.date)||!validTime(b.time)||b.date<new Date().toISOString().slice(0,10)) return json({error:'Enter a valid future date and time'},400);
+    const date=new Date(b.date+'T12:00:00Z');
+    if (Number.isNaN(date.getTime())||date.toISOString().slice(0,10)!==b.date) return json({error:'Invalid calendar date'},400);
+    await env.BOOKINGS_DB.prepare('INSERT OR IGNORE INTO available_slots(date,time) VALUES (?,?)').bind(b.date,b.time).run();
+    return json({ok:true});
+  }
+  if (method==='DELETE' && path==='/admin/api/slots') {
+    const b=await body(request);
+    if (typeof b.date!=='string'||typeof b.time!=='string') return json({error:'Invalid slot'},400);
+    await env.BOOKINGS_DB.prepare('DELETE FROM available_slots WHERE date=? AND time=?').bind(b.date,b.time).run();
+    return json({ok:true});
+  }
   if (method==='GET' && path==='/admin/api/overview') {
     const [staff,services,hours]=await Promise.all([
       env.BOOKINGS_DB.prepare('SELECT id,display_name,active,sort_order FROM barbers ORDER BY sort_order,display_name').all(),
@@ -75,6 +93,14 @@ export default {
  async fetch(request:Request, env:Env):Promise<Response> {
   const url=new URL(request.url);
   const isAdmin=url.pathname==='/admin'||url.pathname.startsWith('/admin/')||url.pathname.startsWith('/admin/api/');
+  if (url.pathname==='/api/slots' && request.method==='GET') {
+    if (!env.BOOKINGS_DB) return json({slots:[]},503);
+    try {
+      const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/London',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+      const result=await env.BOOKINGS_DB.prepare('SELECT date,time FROM available_slots WHERE date>=? ORDER BY date,time LIMIT 200').bind(today).all();
+      return json({slots:result.results});
+    } catch { return json({slots:[]},503); }
+  }
   if (!isAdmin) return env.ASSETS.fetch(request);
   if (!await verifyAdmin(request,env)) return denied();
   if (url.pathname.startsWith('/admin/api/')) {
