@@ -22,7 +22,7 @@ const status=text=>{el('status').textContent=text};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let data={staff:[],services:[],hours:[]};
 async function call(path,options={}){
- const response=await fetch('/api/admin/'+path,{credentials:'same-origin',cache:'no-store',headers:{'content-type':'application/json'},...options});
+ const response=await fetch('/admin/api/'+path,{credentials:'same-origin',cache:'no-store',headers:{'content-type':'application/json'},...options});
  const value=await response.json();if(!response.ok)throw Error(value.error||'Request failed');return value;
 }
 async function load(){
