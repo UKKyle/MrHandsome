@@ -238,6 +238,31 @@ function App() {
           </a>
         </section>
 
+        <section className="work-showcase" id="work">
+          <div className="work-head">
+            <div>
+              <p className="section-kicker">Recent work</p>
+              <h2>Fresh from the chair.</h2>
+            </div>
+            <div className="work-controls" aria-label="Browse recent work">
+              <button type="button" onClick={() => moveWorkReel(-1)} aria-label="Previous image">
+                <ChevronLeft size={20} />
+              </button>
+              <button type="button" onClick={() => moveWorkReel(1)} aria-label="Next image">
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          </div>
+
+          <div className="work-reel" ref={workReelRef}>
+            {workImages.map((image, index) => (
+              <figure className="work-card" key={image.src}>
+                <img src={image.src} alt={image.alt} loading={index === 0 ? 'eager' : 'lazy'} />
+              </figure>
+            ))}
+          </div>
+        </section>
+
         <section className="services" id="services">
           <div className="services-shell">
             <div className="services-copy">
@@ -288,31 +313,6 @@ function App() {
               </form>}
 
             </div>
-          </div>
-        </section>
-
-        <section className="work-showcase" id="work">
-          <div className="work-head">
-            <div>
-              <p className="section-kicker">Recent work</p>
-              <h2>Fresh from the chair.</h2>
-            </div>
-            <div className="work-controls" aria-label="Browse recent work">
-              <button type="button" onClick={() => moveWorkReel(-1)} aria-label="Previous image">
-                <ChevronLeft size={20} />
-              </button>
-              <button type="button" onClick={() => moveWorkReel(1)} aria-label="Next image">
-                <ChevronRight size={20} />
-              </button>
-            </div>
-          </div>
-
-          <div className="work-reel" ref={workReelRef}>
-            {workImages.map((image, index) => (
-              <figure className="work-card" key={image.src}>
-                <img src={image.src} alt={image.alt} loading={index === 0 ? 'eager' : 'lazy'} />
-              </figure>
-            ))}
           </div>
         </section>
 
