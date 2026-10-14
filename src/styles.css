@@ -240,3 +240,13 @@
 .services .simple-booking .booking-phone-option>a:visited{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;color:#e7c49b!important;text-decoration:none!important;border:0!important;background:transparent!important;font-size:14px!important;font-weight:750!important;white-space:nowrap!important}
 .services .simple-booking .booking-phone-option>a:hover{color:#f8d6aa!important;text-decoration:underline!important}
 @media(max-width:600px){.services .simple-booking .booking-phone-option{padding:14px!important;gap:8px!important;flex-wrap:wrap!important}}
+
+/* Desktop hero: supporting copy directly beneath the title. */
+@media(min-width:901px){
+  .hero-copy{justify-content:flex-start!important}
+  .hero-top{flex:0 0 auto}
+  .hero-bottom{flex:0 0 auto;margin-top:29px}
+  .hero-copy .hero-service-line{margin:0!important;padding:0!important}
+  .hero-copy .rating-row{margin-top:21px}
+  .hero-copy .hero-actions{margin-top:27px}
+}
