@@ -275,7 +275,7 @@ function App() {
                 <div><span className="booking-step">MR HANDSOME · KING'S NORTON</span><h3>Choose your appointment.</h3></div>
               </div>
               <div className="booking-phone-option"><span>Prefer to book by phone?</span><a href={business.phoneHref} aria-label={`Call Mr Handsome on ${business.phone}`}><Phone size={16}/> <span>{business.phone}</span></a></div>
-              {!slotsLoaded ? <p className="simple-booking-empty">Checking upcoming availability…</p> :
+              {!bookingConfirmation && (!slotsLoaded ? <p className="simple-booking-empty">Checking upcoming availability…</p> :
                 bookingDates.length===0 ? <div className="simple-booking-empty">
                   <CalendarDays size={27}/><p>No appointment times have been published yet.</p>
                   <p>Please contact the shop for the next available appointment.</p>
@@ -292,7 +292,7 @@ function App() {
                     {visibleTimes.map(slot=><button type="button" key={slot.time} className={bookingTime===slot.time?'selected':''} aria-pressed={bookingTime===slot.time} onClick={()=>setBookingTime(slot.time)}>{slot.time}</button>)}
                   </div>
                 </>
-              }
+              )}
               {bookingConfirmation ? <div className="booking-success" role="status">
                 <div className="booking-success-icon">✓</div>
                 <h4>You're booked in.</h4>
