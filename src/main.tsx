@@ -39,7 +39,6 @@ const reviews = [
 ];
 
 function App() {
-  const [googleStats, setGoogleStats] = useState({ rating: business.rating, reviews: business.reviews });
   const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem('mh-preview') === '1');
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
@@ -49,28 +48,6 @@ function App() {
     document.title = unlocked ? 'Mr Handsome — Concept Preview' : 'Private Concept — Mr Handsome';
   }, [unlocked]);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    fetch('/api/google-profile')
-      .then(response => {
-        if (!response.ok) throw new Error('Google profile lookup failed');
-        return response.json();
-      })
-      .then(data => {
-        if (cancelled) return;
-        if (typeof data.rating === 'number' && typeof data.reviews === 'number') {
-          setGoogleStats({ rating: data.rating, reviews: data.reviews });
-        }
-      })
-      .catch(() => {
-        // Keep the verified fallback values if the live lookup is unavailable.
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   const unlock = (event: FormEvent) => {
     event.preventDefault();
@@ -134,8 +111,8 @@ function App() {
             <p className="hero-service-line">Haircuts · Fades · Beards · Shaves</p>
             <div className="rating-row">
               <div className="stars">{[0,1,2,3,4].map(i => <Star key={i} size={17} fill="currentColor" />)}</div>
-              <strong>{googleStats.rating}</strong>
-              <span>{googleStats.reviews} Google reviews</span>
+              <strong>{business.rating}</strong>
+              <span>{business.reviews} Google reviews</span>
             </div>
             <div className="hero-actions">
               <a className="hero-primary" href={business.phoneHref}><Phone size={16} /> Book by phone</a>
@@ -149,8 +126,8 @@ function App() {
         </section>
 
         <section className="trust-strip" aria-label="Business highlights">
-          <div><strong>{googleStats.rating}/5</strong><span>Google rating</span></div>
-          <div><strong>{googleStats.reviews}</strong><span>Google reviews</span></div>
+          <div><strong>{business.rating}/5</strong><span>Google rating</span></div>
+          <div><strong>{business.reviews}</strong><span>Google reviews</span></div>
           <div><strong>7 days</strong><span>Open every week</span></div>
           <div><strong>King's Norton</strong><span>25 The Green</span></div>
         </section>
@@ -185,10 +162,10 @@ function App() {
               <h2>A reputation already earned.</h2>
             </div>
             <div className="review-score">
-              <strong>{googleStats.rating}</strong>
+              <strong>{business.rating}</strong>
               <div>
                 <div className="stars">{[0,1,2,3,4].map(i => <Star key={i} size={18} fill="currentColor" />)}</div>
-                <span>{googleStats.reviews} Google reviews</span>
+                <span>{business.reviews} Google reviews</span>
               </div>
             </div>
           </div>
@@ -204,7 +181,7 @@ function App() {
           </div>
 
           <div className="reviews-cta">
-            <span>{googleStats.rating} from {googleStats.reviews} Google reviews</span>
+            <span>{business.rating} from {business.reviews} Google reviews</span>
             <a href={business.googleMaps} target="_blank" rel="noreferrer">View Google profile</a>
           </div>
         </section>
