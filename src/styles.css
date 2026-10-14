@@ -221,3 +221,22 @@
 .services .booking-phone-option a:hover{text-decoration:underline}
 .services .simple-booking-form{border-top:0!important;padding-top:12px!important}
 @media(max-width:600px){#booking{scroll-margin-top:82px}.services .simple-booking .booking-phone-option{flex-wrap:wrap;gap:9px}.services .booking-phone-option a{font-size:14px}}
+
+/* Final hero composition: keep the title high and the booking actions low. */
+@media(min-width:901px){
+ .hero{min-height:760px}
+ .hero-copy{min-height:760px;display:flex;flex-direction:column;justify-content:space-between!important;align-items:stretch;padding-top:clamp(46px,5vw,78px);padding-bottom:clamp(46px,5vw,74px)}
+ .hero-top{flex:0 0 auto}
+ .hero-bottom{flex:0 0 auto}
+ .hero-copy .hero-location{margin-bottom:24px}
+ .hero-copy .hero-service-line{margin:0!important;padding:0!important}
+ .hero-copy .rating-row{margin-top:22px}
+ .hero-copy .hero-actions{margin-top:24px}
+ .hero-image{min-height:760px}
+}
+.services .simple-booking .booking-phone-option{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;gap:16px!important;margin:19px 0 7px!important;padding:16px 18px!important;background:#1a1613!important;border:1px solid #493b30!important;border-radius:9px!important;color:#c7b8a9!important;line-height:1.45!important}
+.services .simple-booking .booking-phone-option>span{font-size:12px!important;font-weight:500!important;color:#c5b7a8!important}
+.services .simple-booking .booking-phone-option>a,
+.services .simple-booking .booking-phone-option>a:visited{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;color:#e7c49b!important;text-decoration:none!important;border:0!important;background:transparent!important;font-size:14px!important;font-weight:750!important;white-space:nowrap!important}
+.services .simple-booking .booking-phone-option>a:hover{color:#f8d6aa!important;text-decoration:underline!important}
+@media(max-width:600px){.services .simple-booking .booking-phone-option{padding:14px!important;gap:8px!important;flex-wrap:wrap!important}}
