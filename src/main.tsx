@@ -222,7 +222,7 @@ function App() {
             <span className="trust-copy">
               <span className="trust-eyebrow">OPEN EVERY DAY</span>
               <span className="trust-primary"><strong>Mon–Sun</strong></span>
-              <span className="trust-detail">Walk-ins welcome · Book online</span>
+              <span className="trust-detail">See appointments · Book online</span>
             </span>
           </div>
           <a className="trust-item" href={business.googleMaps} target="_blank" rel="noopener noreferrer">
