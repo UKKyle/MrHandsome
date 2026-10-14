@@ -291,3 +291,19 @@
  .services .simple-booking-days button{scroll-snap-align:start}
  .services .simple-booking-times button{min-height:52px}
 }
+
+/* P2: restrained gallery, useful footer, and clearer location information. */
+.work-swipe-hint{display:none}
+.work-card:nth-child(2n){margin-top:0;height:520px}
+.work-card img{transition:transform .25s ease,filter .25s ease}
+.work-card:hover img{transform:scale(1.012)}
+.work-controls button:focus-visible,.footer-links a:focus-visible{outline:2px solid var(--brass);outline-offset:4px}
+.footer-links{display:flex;justify-content:flex-end;align-items:center;gap:clamp(12px,2vw,26px);flex-wrap:wrap}
+.footer-links a{font-size:12px;white-space:nowrap;text-transform:none}
+@media(max-width:900px){.work-card:nth-child(2n){margin-top:0;height:470px}}
+@media(max-width:600px){
+ .work-card:nth-child(2n){margin-top:0;height:410px}
+ .work-swipe-hint{display:flex;align-items:center;gap:5px;margin:-12px 20px 16px;color:#afa397;font-size:12px}
+ .footer-links{justify-content:flex-start;gap:14px 24px}
+ .visit-panel .hours{margin-top:34px}
+}
