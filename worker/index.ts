@@ -52,7 +52,7 @@ function proposedSlots(today:string,currentTime:string,days=14) {
     const date=day.toISOString().slice(0,10);
     const [start,end]=openingHours[day.getUTCDay()];
     const toMin=(v:string)=>Number(v.slice(0,2))*60+Number(v.slice(3,5));
-    for(let minute=toMin(start);minute+30<=toMin(end);minute+=30){
+    for(let minute=toMin(start);minute+60<=toMin(end);minute+=60){
       const time=`${String(Math.floor(minute/60)).padStart(2,'0')}:${String(minute%60).padStart(2,'0')}`;
       if(date===today&&time<=currentTime)continue;
       out.push({date,time});
@@ -65,8 +65,14 @@ async function getSlots(env:Env,includeBlocked:boolean) {
   const all=proposedSlots(date,time);
   const end=all.at(-1)?.date??date;
   const r=await env.BOOKINGS_DB.prepare('SELECT date,time FROM blocked_slots WHERE date>=? AND date<=?').bind(date,end).all();
-  const blocked=new Set((r.results as {date:string;time:string}[]).map(x=>x.date+'|'+x.time));
-  return all.filter(x=>includeBlocked||!blocked.has(x.date+'|'+x.time)).map(x=>({...x,blocked:blocked.has(x.date+'|'+x.time)}));
+  const blockedRecords=r.results as {date:string;time:string}[];
+  // A 30-minute legacy block anywhere inside an hour also blocks that hour.
+  const isBlocked=(slot:{date:string;time:string})=>blockedRecords.some(row=>
+    row.date===slot.date && row.time>=slot.time &&
+    (Number(row.time.slice(0,2))*60+Number(row.time.slice(3,5))) <
+    (Number(slot.time.slice(0,2))*60+Number(slot.time.slice(3,5))+60)
+  );
+  return all.filter(x=>includeBlocked||!isBlocked(x)).map(x=>({...x,blocked:isBlocked(x)}));
 }
 
 async function api(request:Request,env:Env,url:URL):Promise<Response> {
@@ -78,7 +84,11 @@ async function api(request:Request,env:Env,url:URL):Promise<Response> {
     const allowed=(await getSlots(env,true)).some(x=>x.date===b.date&&x.time===b.time);
     if(!allowed) return json({error:'This time is outside the upcoming opening hours'},400);
     if(b.blocked) await env.BOOKINGS_DB.prepare('INSERT OR IGNORE INTO blocked_slots(date,time) VALUES (?,?)').bind(b.date,b.time).run();
-    else await env.BOOKINGS_DB.prepare('DELETE FROM blocked_slots WHERE date=? AND time=?').bind(b.date,b.time).run();
+    else {
+      const start=Number(b.time.slice(0,2))*60+Number(b.time.slice(3,5))+60;
+      const end=`${String(Math.floor(start/60)).padStart(2,'0')}:${String(start%60).padStart(2,'0')}`;
+      await env.BOOKINGS_DB.prepare('DELETE FROM blocked_slots WHERE date=? AND time>=? AND time<?').bind(b.date,b.time,end).run();
+    }
     return json({ok:true});
   }
   if (method==='GET' && path==='/admin/api/overview') {
