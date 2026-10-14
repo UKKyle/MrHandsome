@@ -279,19 +279,6 @@ function App() {
           </div>
         </section>
 
-        <section className="service-details" aria-label="Barber services"><div className="service-menu">
-              {services.map(([title, description], index) => (
-                <article className="service-line" key={title}>
-                  <span>{String(index + 1).padStart(2, '0')}</span>
-                  <div>
-                    <h3>{title}</h3>
-                    <p>{description}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-        </section>
-
         <section className="work-showcase" id="work">
           <div className="work-head">
             <div>
