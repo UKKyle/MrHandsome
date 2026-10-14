@@ -21,12 +21,7 @@ jobs:
           mkdir -p public
           curl -L --fail --silent --show-error             "https://mr-handsome-concept-mijizk.v2.appdeploy.ai/resources/mr-handsome-hero.webp"             -o public/mr-handsome-hero.webp
       - run: npm run build
-      - name: Sync Google Places secret
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
-        run: printf '%s' "$GOOGLE_PLACES_API_KEY" | npx wrangler secret put GOOGLE_PLACES_API_KEY
-      - name: Deploy to claimed Cloudflare Worker
+      - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
