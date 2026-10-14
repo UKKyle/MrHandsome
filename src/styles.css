@@ -190,3 +190,20 @@
 .booking-success h4{font-family:Georgia,serif;font-size:26px;font-weight:400;margin:0 0 12px}
 .booking-success p{font-size:13px;color:#e3d8c9;line-height:1.6}
 .booking-success button{margin-top:10px;background:transparent;color:#e7c797;border:1px solid #aa885c;padding:12px 20px;cursor:pointer}
+
+/* Booking checkout — scoped to override the site's legacy generic form rules. */
+.services .simple-booking{min-width:0;overflow:hidden;border-radius:12px;background:#211b17;box-shadow:0 24px 70px #0002}
+.services .simple-booking .simple-booking-form{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:16px!important;margin:26px 0 0!important;padding:26px 0 0!important;border:0;border-top:1px solid #524337}
+.services .simple-booking-form>label:not(.booking-agreement){display:block!important;margin:0!important;font-size:13px!important;color:#e7d8c8!important;line-height:1.4!important}
+.services .simple-booking-form>input#customer-booking-name{display:block!important;box-sizing:border-box!important;position:static!important;width:100%!important;max-width:none!important;height:52px!important;min-height:52px!important;margin:0!important;padding:0 16px!important;background:#171311!important;color:#f5f0e8!important;border:1px solid #655448!important;border-radius:7px!important;font:inherit!important;font-size:15px!important;line-height:normal!important}
+.services .simple-booking-form .booking-agreement{display:flex!important;flex-direction:row!important;align-items:flex-start!important;gap:12px!important;width:100%!important;margin:2px 0 0!important;color:#d0c0b2!important;line-height:1.65!important;font-size:12px!important;letter-spacing:normal!important;white-space:normal!important}
+.services .booking-agreement input[type=checkbox]{appearance:auto!important;display:block!important;position:static!important;flex:none!important;width:18px!important;min-width:18px!important;height:18px!important;min-height:18px!important;margin:1px 0 0!important;padding:0!important;accent-color:#be976a!important}
+.services .booking-agreement span{display:block!important;flex:1!important;min-width:0!important;font:inherit!important}
+.services .simple-booking-form button.booking-submit{display:flex!important;position:static!important;align-items:center!important;justify-content:center!important;width:100%!important;min-height:54px!important;padding:14px 18px!important;margin:4px 0 0!important;border-radius:7px!important;background:#c09a6a!important;color:#1a130d!important;font-weight:800!important;font-size:14px!important;line-height:1.3!important}
+.services .simple-booking-form .booking-privacy{margin:0!important;text-align:center!important;font-size:11px!important;line-height:1.6!important;color:#b7a797!important}
+.services .simple-booking-days{padding-bottom:9px;gap:9px}
+.services .simple-booking-days button{border-radius:7px;text-align:center;min-height:76px}
+.services .simple-booking-times{gap:10px}
+.services .simple-booking-times button{border-radius:7px;min-height:49px;transition:border-color .15s,background .15s}
+.services .simple-booking-times button.selected{border-color:#c7a074;box-shadow:inset 0 0 0 1px #c7a074}
+@media(max-width:760px){.services .simple-booking{border-radius:9px}.services .simple-booking-form{gap:14px!important}.services .simple-booking-times{grid-template-columns:repeat(3,minmax(0,1fr))}}
