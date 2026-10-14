@@ -172,7 +172,7 @@ function App() {
           <button onClick={() => go('visit')}>Visit</button>
           <a href={business.facebook} target="_blank" rel="noreferrer">Facebook</a>
         </nav>
-        <a className="header-cta" href={business.phoneHref}>BOOK BY PHONE</a>
+        <a className="header-cta" href="#booking">BOOK APPOINTMENT</a>
         <button className="menu-button" aria-label="Toggle navigation" onClick={() => setMenuOpen(v => !v)}>
           {menuOpen ? <X /> : <Menu />}
         </button>
@@ -190,7 +190,7 @@ function App() {
               <span>{business.reviews} Google reviews</span>
             </div>
             <div className="hero-actions">
-              <a className="hero-primary" href={business.phoneHref}><Phone size={16} /> Book by phone</a>
+              <a className="hero-primary" href="#booking"><CalendarDays size={16} /> Book appointment</a>
               <a className="hero-secondary" href={business.googleMaps} target="_blank" rel="noreferrer"><MapPin size={16} /> Directions</a>
             </div>
           </div>
@@ -234,10 +234,11 @@ function App() {
               <h2>Your next visit, made simple.</h2>
               <p>Choose a day and time, enter your name, and book your appointment.</p>
             </div>
-            <div className="booking-preview simple-booking" aria-label="Upcoming appointment availability">
+            <div className="booking-preview simple-booking" id="booking" aria-label="Upcoming appointment availability">
               <div className="booking-preview-head">
                 <div><span className="booking-step">MR HANDSOME · KING'S NORTON</span><h3>Find a time that suits you.</h3></div>
               </div>
+              <div className="booking-phone-option"><span>Prefer to speak to us?</span><a href={business.phoneHref}><Phone size={15}/> {business.phone}</a></div>
               {!slotsLoaded ? <p className="simple-booking-empty">Checking upcoming availability…</p> :
                 bookingDates.length===0 ? <div className="simple-booking-empty">
                   <CalendarDays size={27}/><p>No appointment times have been published yet.</p>
@@ -358,7 +359,7 @@ function App() {
             <p className="visit-address">{business.address}</p>
             <div className="visit-actions">
               <a className="visit-primary" href={business.googleMaps} target="_blank" rel="noreferrer"><MapPin size={16} /> Get directions</a>
-              <a className="visit-secondary" href={business.phoneHref}><Phone size={16} /> Book by phone</a>
+              <a className="visit-secondary" href="#booking"><CalendarDays size={16} /> Book appointment</a>
             </div>
             <div className="hours">
               <h3>Opening hours</h3>
@@ -375,7 +376,7 @@ function App() {
       </footer>
 
       <div className="mobile-actions" aria-label="Quick actions">
-        <a href={business.phoneHref}><Phone size={17} /> Book</a>
+        <a href="#booking"><CalendarDays size={17} /> Book</a>
         <a href={business.googleMaps} target="_blank" rel="noreferrer"><MapPin size={17} /> Directions</a>
       </div>
     </div>
