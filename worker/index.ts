@@ -64,7 +64,10 @@ async function getSlots(env:Env,includeBlocked:boolean) {
   const {date,time}=londonParts(new Date());
   const all=proposedSlots(date,time);
   const end=all.at(-1)?.date??date;
-  const r=await env.BOOKINGS_DB.prepare('SELECT date,time FROM blocked_slots WHERE date>=? AND date<=?').bind(date,end).all();
+  const [r,bookings]=await Promise.all([
+    env.BOOKINGS_DB.prepare('SELECT date,time FROM blocked_slots WHERE date>=? AND date<=?').bind(date,end).all(),
+    env.BOOKINGS_DB.prepare('SELECT date,time,customer_name FROM simple_bookings WHERE date>=? AND date<=?').bind(date,end).all()
+  ]);
   const blockedRecords=r.results as {date:string;time:string}[];
   // A 30-minute legacy block anywhere inside an hour also blocks that hour.
   const isBlocked=(slot:{date:string;time:string})=>blockedRecords.some(row=>
@@ -72,17 +75,25 @@ async function getSlots(env:Env,includeBlocked:boolean) {
     (Number(row.time.slice(0,2))*60+Number(row.time.slice(3,5))) <
     (Number(slot.time.slice(0,2))*60+Number(slot.time.slice(3,5))+60)
   );
-  return all.filter(x=>includeBlocked||!isBlocked(x)).map(x=>({...x,blocked:isBlocked(x)}));
+  const reservations=new Map((bookings.results as {date:string;time:string;customer_name:string}[]).map(x=>[x.date+'|'+x.time,x.customer_name]));
+  return all.filter(x=>includeBlocked||(!isBlocked(x)&&!reservations.has(x.date+'|'+x.time))).map(x=>({...x,blocked:isBlocked(x),booked:reservations.has(x.date+'|'+x.time),customer_name:includeBlocked?(reservations.get(x.date+'|'+x.time)??null):undefined}));
 }
 
 async function api(request:Request,env:Env,url:URL):Promise<Response> {
   const path=url.pathname,method=request.method;
   if (method==='GET' && path==='/admin/api/slots') return json({slots:await getSlots(env,true)});
+  if (method==='DELETE' && path==='/admin/api/bookings') {
+    const b=await body(request);
+    if(typeof b.date!=='string'||typeof b.time!=='string')return json({error:'Invalid reservation'},400);
+    await env.BOOKINGS_DB.prepare('DELETE FROM simple_bookings WHERE date=? AND time=?').bind(b.date,b.time).run();
+    return json({ok:true});
+  }
   if (method==='POST' && path==='/admin/api/slots') {
     const b=await body(request);
     if (typeof b.date!=='string'||typeof b.time!=='string'||typeof b.blocked!=='boolean') return json({error:'Invalid time slot'},400);
     const allowed=(await getSlots(env,true)).some(x=>x.date===b.date&&x.time===b.time);
     if(!allowed) return json({error:'This time is outside the upcoming opening hours'},400);
+    if(b.blocked && (await getSlots(env,true)).some(x=>x.date===b.date&&x.time===b.time&&x.booked)) return json({error:'Cancel the reservation before blocking this time'},409);
     if(b.blocked) await env.BOOKINGS_DB.prepare('INSERT OR IGNORE INTO blocked_slots(date,time) VALUES (?,?)').bind(b.date,b.time).run();
     else {
       const start=Number(b.time.slice(0,2))*60+Number(b.time.slice(3,5))+60;
@@ -133,6 +144,23 @@ export default {
     if(!env.BOOKINGS_DB)return json({slots:[]},503);
     try {return json({slots:(await getSlots(env,false)).map(({date,time})=>({date,time}))});}
     catch {return json({slots:[]},503);}
+  }
+  if(url.pathname==='/api/bookings' && request.method==='POST') {
+    if(!env.BOOKINGS_DB)return json({error:'Bookings unavailable'},503);
+    try {
+      if(request.headers.get('content-type')?.split(';')[0]!=='application/json')return json({error:'Invalid request'},415);
+      const input=await body(request);
+      const name=typeof input.name==='string'?input.name.trim().replace(/\\s+/g,' '):'';
+      const date=input.date,time=input.time;
+      if(name.length<2||name.length>80||/[<>\\x00-\\x1f]/.test(name)||typeof date!=='string'||typeof time!=='string'||input.accepted_terms!==true) return json({error:'Enter your name and accept the arrival terms'},400);
+      if(!(await getSlots(env,false)).some(x=>x.date===date&&x.time===time))return json({error:'This time is no longer available. Please choose another.'},409);
+      // Unique (date,time) is enforced in D1 even under simultaneous requests.
+      await env.BOOKINGS_DB.prepare(`INSERT INTO simple_bookings(date,time,customer_name) SELECT ?,?,? WHERE NOT EXISTS (
+        SELECT 1 FROM blocked_slots WHERE date=? AND time>=? AND time<?
+      )`).bind(date,time,name,date,time,
+        `${String(Math.floor((Number(time.slice(0,2))*60+Number(time.slice(3,5))+60)/60)).padStart(2,'0')}:${String((Number(time.slice(0,2))*60+Number(time.slice(3,5))+60)%60).padStart(2,'0')}`).run();
+      return json({ok:true,date,time});
+    } catch {return json({error:'This time could not be booked. Refresh availability and try again.'},409);}
   }
   if (!isAdmin) return env.ASSETS.fetch(request);
   if (!await verifyAdmin(request,env)) return denied();
