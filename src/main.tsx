@@ -178,7 +178,7 @@ function App() {
       <header>
         <button className="brand" onClick={() => go('top')}>MR HANDSOME</button>
         <nav className={menuOpen ? 'open' : ''}>
-          <button onClick={() => go('services')}>Services</button>
+          <button onClick={() => go('work')}>Gallery</button>
           <button onClick={() => go('reviews')}>Reviews</button>
           <button onClick={() => go('visit')}>Visit</button>
           <a href={business.facebook} target="_blank" rel="noreferrer">Facebook</a>
