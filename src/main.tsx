@@ -1,6 +1,6 @@
 import React, { FormEvent, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ChevronLeft, ChevronRight, MapPin, Menu, Phone, Star, X } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, MapPin, Menu, Phone, Star, X } from 'lucide-react';
 import './styles.css';
 const heroImage = '/images/hero.webp';
 const workImage1 = '/images/work-1.webp';
@@ -161,11 +161,31 @@ function App() {
           </figure>
         </section>
 
-        <section className="trust-strip" aria-label="Business highlights">
-          <div><strong>{business.rating}/5</strong><span>Google rating</span></div>
-          <div><strong>{business.reviews}</strong><span>Google reviews</span></div>
-          <div><strong>7 days</strong><span>Open every week</span></div>
-          <div><strong>King's Norton</strong><span>25 The Green</span></div>
+        <section className="trust-strip" aria-label="Why visit Mr Handsome">
+          <a className="trust-item trust-reviews" href={business.googleMaps} target="_blank" rel="noopener noreferrer" aria-label={`Find Mr Handsome on Google Maps. Rating ${business.rating} out of 5 from ${business.reviews} Google reviews`}>
+            <span className="trust-icon trust-google" aria-hidden="true">G</span>
+            <span className="trust-copy">
+              <span className="trust-eyebrow">RATED ON GOOGLE</span>
+              <span className="trust-primary"><strong>{business.rating}<small>/5</small></strong><span className="trust-stars" aria-label="Five stars">{[0,1,2,3,4].map(i => <Star key={i} size={15} fill="currentColor" />)}</span></span>
+              <span className="trust-detail">{business.reviews} customer reviews <ChevronRight size={14} aria-hidden="true" /></span>
+            </span>
+          </a>
+          <div className="trust-item">
+            <span className="trust-icon" aria-hidden="true"><CalendarDays size={23} strokeWidth={1.6} /></span>
+            <span className="trust-copy">
+              <span className="trust-eyebrow">HERE WHEN YOU NEED US</span>
+              <span className="trust-primary"><strong>7 days a week</strong></span>
+              <span className="trust-detail">Open Monday to Sunday</span>
+            </span>
+          </div>
+          <a className="trust-item" href={business.googleMaps} target="_blank" rel="noopener noreferrer">
+            <span className="trust-icon" aria-hidden="true"><MapPin size={23} strokeWidth={1.6} /></span>
+            <span className="trust-copy">
+              <span className="trust-eyebrow">YOUR LOCAL BARBERS</span>
+              <span className="trust-primary"><strong>King's Norton</strong></span>
+              <span className="trust-detail">25 The Green · Get directions <ChevronRight size={14} aria-hidden="true" /></span>
+            </span>
+          </a>
         </section>
 
         <section className="services" id="services">
