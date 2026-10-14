@@ -20,11 +20,7 @@ const business = {
   googleEmbed: "https://www.google.com/maps?q=25+The+Green,+King's+Norton,+Birmingham+B38+8SD&output=embed",
   heroImage,
   hours: [
-    ['Monday', '9:30am – 7:00pm'],
-    ['Tuesday', '9:30am – 7:00pm'],
-    ['Wednesday', '9:30am – 7:00pm'],
-    ['Thursday', '9:30am – 7:00pm'],
-    ['Friday', '9:30am – 7:00pm'],
+    ['Monday–Friday', '9:30am – 7:00pm'],
     ['Saturday', '8:30am – 5:00pm'],
     ['Sunday', '11:00am – 4:00pm'],
   ],
@@ -224,17 +220,17 @@ function App() {
           <div className="trust-item">
             <span className="trust-icon" aria-hidden="true"><CalendarDays size={23} strokeWidth={1.6} /></span>
             <span className="trust-copy">
-              <span className="trust-eyebrow">HERE WHEN YOU NEED US</span>
-              <span className="trust-primary"><strong>7 days a week</strong></span>
-              <span className="trust-detail">Open Monday to Sunday</span>
+              <span className="trust-eyebrow">OPEN EVERY DAY</span>
+              <span className="trust-primary"><strong>Mon–Sun</strong></span>
+              <span className="trust-detail">Walk-ins welcome · Book online</span>
             </span>
           </div>
           <a className="trust-item" href={business.googleMaps} target="_blank" rel="noopener noreferrer">
             <span className="trust-icon" aria-hidden="true"><MapPin size={23} strokeWidth={1.6} /></span>
             <span className="trust-copy">
-              <span className="trust-eyebrow">YOUR LOCAL BARBERS</span>
-              <span className="trust-primary"><strong>King's Norton</strong></span>
-              <span className="trust-detail">25 The Green · Get directions <ChevronRight size={14} aria-hidden="true" /></span>
+              <span className="trust-eyebrow">FIND THE SHOP</span>
+              <span className="trust-primary"><strong>25 The Green</strong></span>
+              <span className="trust-detail">King’s Norton · Directions <ChevronRight size={14} aria-hidden="true" /></span>
             </span>
           </a>
         </section>
@@ -243,7 +239,7 @@ function App() {
           <div className="work-head">
             <div>
               <p className="section-kicker">Recent work</p>
-              <h2>Fresh from the chair.</h2>
+              <h2>Recent cuts.</h2>
             </div>
             <div className="work-controls" aria-label="Browse recent work">
               <button type="button" onClick={() => moveWorkReel(-1)} aria-label="Previous image">
@@ -255,6 +251,7 @@ function App() {
             </div>
           </div>
 
+          <p className="work-swipe-hint">Swipe to see more work <ChevronRight size={14} aria-hidden="true"/></p>
           <div className="work-reel" ref={workReelRef}>
             {workImages.map((image, index) => (
               <figure className="work-card" key={image.src}>
@@ -321,7 +318,7 @@ function App() {
           <div className="reviews-head">
             <div>
               <p className="section-kicker">Customer reviews</p>
-              <h2>A reputation already earned.</h2>
+              <h2>What customers say.</h2>
             </div>
             <div className="review-score">
               <strong>{business.rating}</strong>
@@ -343,7 +340,7 @@ function App() {
           </div>
 
           <div className="reviews-cta">
-            <span>{business.rating} from {business.reviews} Google reviews</span>
+            <span>Read more customer feedback</span>
             <a href={business.googleMaps} target="_blank" rel="noreferrer">View Google profile</a>
           </div>
         </section>
@@ -371,8 +368,8 @@ function App() {
 
       <footer>
         <strong>MR HANDSOME</strong>
-        <span>25 The Green · King's Norton · Birmingham</span>
-        <a href={business.facebook} target="_blank" rel="noreferrer">FACEBOOK</a>
+        <span>25 The Green · King’s Norton · Birmingham B38 8SD</span>
+        <div className="footer-links"><a href={business.phoneHref}>Call {business.phone}</a><a href={business.googleMaps} target="_blank" rel="noreferrer">Directions</a><a href={business.facebook} target="_blank" rel="noreferrer">Facebook</a></div>
       </footer>
 
       <div className="mobile-actions" aria-label="Quick actions">
