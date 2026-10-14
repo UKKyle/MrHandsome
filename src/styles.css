@@ -120,3 +120,6 @@
   .hero .rating-row{margin-top:19px}
   .hero .hero-actions{margin-top:auto;padding-top:26px}
 }
+
+/* Mobile: the persistent booking bar is the sole CTA; retain desktop hero actions. */
+@media (max-width:760px){.hero .hero-actions{display:none}}
