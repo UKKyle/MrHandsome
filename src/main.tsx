@@ -169,6 +169,7 @@ function App() {
 
   return (
     <div className="site">
+      <a className="skip-link" href="#booking">Skip to booking</a>
       <div className="preview-note">Private concept preview — not the live Mr Handsome website</div>
 
       <header>
@@ -181,7 +182,7 @@ function App() {
           <a href={business.facebook} target="_blank" rel="noreferrer">Facebook</a>
         </nav>
         <a className="header-cta" href="#booking">BOOK APPOINTMENT</a>
-        <button className="menu-button" aria-label="Toggle navigation" onClick={() => setMenuOpen(v => !v)}>
+        <button className="menu-button" aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen} onClick={() => setMenuOpen(v => !v)}>
           {menuOpen ? <X /> : <Menu />}
         </button>
       </header>
