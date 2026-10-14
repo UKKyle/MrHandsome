@@ -267,12 +267,12 @@ function App() {
           <div className="services-shell">
             <div className="services-copy">
               <p className="section-kicker">Appointments</p>
-              <h2>Your next visit, made simple.</h2>
-              <p>Choose a day and time, enter your name, and book your appointment.</p>
+              <h2>Book your next visit.</h2>
+              <p>Choose a time, enter your name and you’re booked. No account required.</p>
             </div>
             <div className="booking-preview simple-booking" id="booking" aria-label="Upcoming appointment availability">
               <div className="booking-preview-head">
-                <div><span className="booking-step">MR HANDSOME · KING'S NORTON</span><h3>Find a time that suits you.</h3></div>
+                <div><span className="booking-step">MR HANDSOME · KING'S NORTON</span><h3>Choose your appointment.</h3></div>
               </div>
               <div className="booking-phone-option"><span>Prefer to book by phone?</span><a href={business.phoneHref} aria-label={`Call Mr Handsome on ${business.phone}`}><Phone size={16}/> <span>{business.phone}</span></a></div>
               {!slotsLoaded ? <p className="simple-booking-empty">Checking upcoming availability…</p> :
