@@ -156,3 +156,21 @@
 .service-details>.service-menu{max-width:1240px;margin:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:65px}
 @media(max-width:900px){.services-shell{grid-template-columns:1fr}.service-details>.service-menu{grid-template-columns:1fr}}
 @media(max-width:600px){.booking-preview{padding:21px 16px;margin:0 -2px}.booking-preview-head h3{font-size:28px}.booking-service-options{grid-template-columns:repeat(2,minmax(0,1fr))}.booking-day-options{gap:5px}.booking-day-options button{padding:10px 3px}.booking-day-options strong{font-size:10px}.booking-day-options span{font-size:10px}.booking-preview-foot{display:block}.booking-preview-foot p{max-width:none}.booking-enquire{display:none}.service-details{padding:0 20px 54px}}
+
+/* Minimal availability booking layout */
+.simple-booking{max-width:100%;padding:clamp(22px,3vw,36px)}
+.simple-booking .booking-preview-head{padding-bottom:22px}
+.simple-booking .booking-preview-head h3{max-width:520px}
+.simple-booking-label{margin:25px 0 12px;color:#d9c5af;font-size:12px;font-weight:700}
+.simple-booking-days{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.simple-booking-days button{flex:0 0 83px;padding:14px 7px;display:grid;text-align:center;gap:7px}
+.simple-booking-days button span{font-size:11px;color:#bcae9f}
+.simple-booking-days button strong{font-size:14px;font-weight:700}
+.simple-booking-times{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.simple-booking-times button{padding:15px 8px;text-align:center;font-size:13px}
+.simple-booking-empty{min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;color:#c8b19a}
+.simple-booking-empty p{margin:4px 0;color:#bdb0a3;font-size:13px}
+.simple-booking-footer{margin-top:26px;padding-top:20px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:14px}
+.simple-booking-footer span{max-width:250px;color:#ada093;font-size:11px;line-height:1.5}
+.simple-booking-footer a{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 15px;background:var(--brass);color:#1a120d;text-decoration:none;font-size:12px;font-weight:800;white-space:nowrap}
+@media(max-width:600px){.simple-booking-days button{flex-basis:75px}.simple-booking-footer{flex-direction:column;align-items:stretch;text-align:center}.simple-booking-footer span{max-width:none}.simple-booking-footer a{min-height:48px}}
