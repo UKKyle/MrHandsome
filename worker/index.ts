@@ -35,24 +35,50 @@ async function body(request:Request):Promise<Record<string,unknown>> {
   if (!result || typeof result!=='object' || Array.isArray(result)) throw new Error('Invalid request');
   return result as Record<string,unknown>;
 }
+
+const openingHours:Record<number,[string,string]> = {
+  0:['11:00','16:00'],1:['09:30','19:00'],2:['09:30','19:00'],
+  3:['09:30','19:00'],4:['09:30','19:00'],5:['09:30','19:00'],6:['08:30','17:00']
+};
+function londonParts(now:Date) {
+  const parts=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(now).map(x=>[x.type,x.value]));
+  return {date:`${parts.year}-${parts.month}-${parts.day}`,time:`${parts.hour}:${parts.minute}`};
+}
+function proposedSlots(today:string,currentTime:string,days=14) {
+  const out:{date:string;time:string}[]=[];
+  const base=new Date(today+'T12:00:00Z');
+  for(let d=0;d<days;d++){
+    const day=new Date(base.getTime()+d*86400000);
+    const date=day.toISOString().slice(0,10);
+    const [start,end]=openingHours[day.getUTCDay()];
+    const toMin=(v:string)=>Number(v.slice(0,2))*60+Number(v.slice(3,5));
+    for(let minute=toMin(start);minute+30<=toMin(end);minute+=30){
+      const time=`${String(Math.floor(minute/60)).padStart(2,'0')}:${String(minute%60).padStart(2,'0')}`;
+      if(date===today&&time<=currentTime)continue;
+      out.push({date,time});
+    }
+  }
+  return out;
+}
+async function getSlots(env:Env,includeBlocked:boolean) {
+  const {date,time}=londonParts(new Date());
+  const all=proposedSlots(date,time);
+  const end=all.at(-1)?.date??date;
+  const r=await env.BOOKINGS_DB.prepare('SELECT date,time FROM blocked_slots WHERE date>=? AND date<=?').bind(date,end).all();
+  const blocked=new Set((r.results as {date:string;time:string}[]).map(x=>x.date+'|'+x.time));
+  return all.filter(x=>includeBlocked||!blocked.has(x.date+'|'+x.time)).map(x=>({...x,blocked:blocked.has(x.date+'|'+x.time)}));
+}
+
 async function api(request:Request,env:Env,url:URL):Promise<Response> {
   const path=url.pathname,method=request.method;
-  if (method==='GET' && path==='/admin/api/slots') {
-    const slots=await env.BOOKINGS_DB.prepare('SELECT date,time FROM available_slots WHERE date>=? ORDER BY date,time LIMIT 500').bind(new Date().toISOString().slice(0,10)).all();
-    return json({slots:slots.results});
-  }
+  if (method==='GET' && path==='/admin/api/slots') return json({slots:await getSlots(env,true)});
   if (method==='POST' && path==='/admin/api/slots') {
     const b=await body(request);
-    if (typeof b.date!=='string'||!/^\\d{4}-\\d{2}-\\d{2}$/.test(b.date)||!validTime(b.time)||b.date<new Date().toISOString().slice(0,10)) return json({error:'Enter a valid future date and time'},400);
-    const date=new Date(b.date+'T12:00:00Z');
-    if (Number.isNaN(date.getTime())||date.toISOString().slice(0,10)!==b.date) return json({error:'Invalid calendar date'},400);
-    await env.BOOKINGS_DB.prepare('INSERT OR IGNORE INTO available_slots(date,time) VALUES (?,?)').bind(b.date,b.time).run();
-    return json({ok:true});
-  }
-  if (method==='DELETE' && path==='/admin/api/slots') {
-    const b=await body(request);
-    if (typeof b.date!=='string'||typeof b.time!=='string') return json({error:'Invalid slot'},400);
-    await env.BOOKINGS_DB.prepare('DELETE FROM available_slots WHERE date=? AND time=?').bind(b.date,b.time).run();
+    if (typeof b.date!=='string'||typeof b.time!=='string'||typeof b.blocked!=='boolean') return json({error:'Invalid time slot'},400);
+    const allowed=(await getSlots(env,true)).some(x=>x.date===b.date&&x.time===b.time);
+    if(!allowed) return json({error:'This time is outside the upcoming opening hours'},400);
+    if(b.blocked) await env.BOOKINGS_DB.prepare('INSERT OR IGNORE INTO blocked_slots(date,time) VALUES (?,?)').bind(b.date,b.time).run();
+    else await env.BOOKINGS_DB.prepare('DELETE FROM blocked_slots WHERE date=? AND time=?').bind(b.date,b.time).run();
     return json({ok:true});
   }
   if (method==='GET' && path==='/admin/api/overview') {
@@ -94,12 +120,9 @@ export default {
   const url=new URL(request.url);
   const isAdmin=url.pathname==='/admin'||url.pathname.startsWith('/admin/')||url.pathname.startsWith('/admin/api/');
   if (url.pathname==='/api/slots' && request.method==='GET') {
-    if (!env.BOOKINGS_DB) return json({slots:[]},503);
-    try {
-      const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/London',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-      const result=await env.BOOKINGS_DB.prepare('SELECT date,time FROM available_slots WHERE date>=? ORDER BY date,time LIMIT 200').bind(today).all();
-      return json({slots:result.results});
-    } catch { return json({slots:[]},503); }
+    if(!env.BOOKINGS_DB)return json({slots:[]},503);
+    try {return json({slots:(await getSlots(env,false)).map(({date,time})=>({date,time}))});}
+    catch {return json({slots:[]},503);}
   }
   if (!isAdmin) return env.ASSETS.fetch(request);
   if (!await verifyAdmin(request,env)) return denied();
