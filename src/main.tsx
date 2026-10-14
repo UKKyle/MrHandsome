@@ -78,6 +78,8 @@ function App() {
   const [bookingError, setBookingError] = useState('');
   const [bookingConfirmation, setBookingConfirmation] = useState<{date:string;time:string;name:string}|null>(null);
   const workReelRef = React.useRef<HTMLDivElement>(null);
+  const selectionRef=React.useRef<{date:string|null;time:string|null}>({date:null,time:null});
+  selectionRef.current={date:selectedDate,time:bookingTime};
 
   useEffect(() => {
     document.title = unlocked ? 'Mr Handsome — Concept Preview' : 'Private Concept — Mr Handsome';
@@ -107,7 +109,8 @@ function App() {
     const slots=Array.isArray(data.slots)?data.slots:[];
     setAvailableSlots(slots);
     setSelectedDate(previous=>previous && slots.some(item=>item.date===previous)?previous:(slots[0]?.date??null));
-    setBookingTime(null);
+    const selected=selectionRef.current;
+    if(selected.time && !slots.some(item=>item.date===selected.date&&item.time===selected.time))setBookingTime(null);
     setSlotsLoaded(true);
     return slots;
   };
