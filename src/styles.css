@@ -307,3 +307,11 @@
  .footer-links{justify-content:flex-start;gap:14px 24px}
  .visit-panel .hours{margin-top:34px}
 }
+
+/* P3: accessible keyboard navigation and responsive safety. */
+.skip-link{position:fixed;top:8px;left:12px;z-index:1000;padding:12px 18px;background:#ead2b1;color:#17120f;font-size:14px;font-weight:800;text-decoration:none;transform:translateY(-160%);transition:transform .15s}
+.skip-link:focus{transform:translateY(0)}
+button:focus-visible,a:focus-visible{outline:2px solid #e4bc84;outline-offset:3px}
+.work-reel:focus-visible,.trust-strip:focus-visible{outline:2px solid #e4bc84;outline-offset:-2px}
+@media(max-width:900px){.hero-copy,.services-shell,.booking-preview{min-width:0}}
+@media(prefers-reduced-motion:reduce){.skip-link{transition:none}*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
