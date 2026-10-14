@@ -9,7 +9,8 @@
     "run_worker_first": [
       "/admin",
       "/admin/*",
-      "/api/admin/*"
+      "/api/admin/*",
+      "/api/slots"
     ]
   },
   "main": "./worker/index.ts",
