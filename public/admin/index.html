@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Mr Handsome · Studio Admin</title>
+<style>
+:root{font-family:Arial,sans-serif;color:#f5eadf;background:#11100f}*{box-sizing:border-box}body{margin:0}header{border-bottom:1px solid #382e27;padding:22px clamp(18px,5vw,70px);display:flex;justify-content:space-between;align-items:center;gap:15px}header strong{letter-spacing:.13em}header span{font-size:12px;color:#ba9260}main{max-width:1160px;margin:auto;padding:45px 20px 90px}h1{font-family:Georgia,serif;font-size:clamp(38px,5vw,60px);font-weight:400;margin:0 0 10px}h2{font-family:Georgia,serif;font-size:28px;font-weight:400;margin:0 0 18px}p{color:#b7aaa0;line-height:1.65}.lead{margin-bottom:35px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}.panel{background:#1d1815;border:1px solid #423228;padding:26px;margin-bottom:24px}.full{grid-column:1/-1}.muted{font-size:12px;color:#ab9b8d}form{display:grid;gap:13px}label{display:grid;gap:6px;font-size:12px;color:#cfb898}input,select{width:100%;border:1px solid #544236;background:#131110;color:#f4eadf;border-radius:0;padding:12px;font:inherit;min-height:44px}button{border:0;padding:13px 18px;font-weight:700;background:#bc915c;color:#130f0c;cursor:pointer}button.secondary{background:transparent;border:1px solid #755b43;color:#dbc9b8}button:disabled{opacity:.6;cursor:wait}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.list{display:grid;gap:8px;margin-top:17px}.item{display:flex;align-items:center;justify-content:space-between;gap:15px;border-top:1px solid #3b3029;padding:12px 0;font-size:14px}.item small{color:#ab9b8d;display:block;margin-top:5px}.item button{padding:8px 10px}#status{min-height:30px;color:#c9a876;font-size:13px}footer{font-size:12px;color:#9d8b7e;padding:20px;text-align:center}@media(max-width:750px){.grid{grid-template-columns:1fr}.panel{padding:20px}.fields{grid-template-columns:1fr}}
+</style></head><body>
+<header><strong>MR HANDSOME <span>/ STUDIO</span></strong><span>Private administration</span></header>
+<main>
+<div class="lead"><h1>Studio management.</h1><p>Manage your team, services, and weekly hours. Booking confirmation, customer records and image uploads will be added after the scheduling and access controls have been tested.</p></div>
+<div id="status" role="status" aria-live="polite">Loading studio configuration…</div>
+<div class="grid">
+<section class="panel"><h2>Barbers</h2><p class="muted">Add or update any number of staff members. Disable a barber instead of deleting their booking history.</p>
+<form id="staff-form"><div class="fields"><label>Staff ID<input name="id" required pattern="[a-z0-9_-]{2,64}" placeholder="alex"></label><label>Display name<input name="display_name" required maxlength="80" placeholder="Alex"></label></div><label>Status<select name="active"><option value="true">Active</option><option value="false">Inactive</option></select></label><button>Add / update barber</button></form><div id="staff-list" class="list"></div></section>
+<section class="panel"><h2>Services</h2><p class="muted">Define service durations and cleanup buffers. Display prices and service-to-barber assignments will follow.</p>
+<form id="services-form"><div class="fields"><label>Service ID<input name="id" required pattern="[a-z0-9_-]{2,64}" placeholder="skin-fade"></label><label>Name<input name="title" required maxlength="80" placeholder="Skin fade"></label><label>Duration (min)<input name="duration_minutes" type="number" required min="5" max="240" value="45"></label><label>Buffer (min)<input name="buffer_minutes" type="number" required min="0" max="120" value="5"></label></div><label>Status<select name="active"><option value="true">Active</option><option value="false">Inactive</option></select></label><button>Add / update service</button></form><div id="service-list" class="list"></div></section>
+<section class="panel full"><h2>Weekly working hours</h2><p class="muted">Add several intervals per day to support breaks and split shifts. Times are local to the barbershop (Europe/London).</p>
+<form id="hours-form"><div class="fields"><label>Barber<select name="barber_id" id="hour-barber" required></select></label><label>Weekday<select name="weekday"><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option><option value="0">Sunday</option></select></label><label>From<input type="time" name="starts_at" value="09:30" required></label><label>To<input type="time" name="ends_at" value="17:00" required></label></div><button>Add working interval</button></form><div id="hours-list" class="list"></div></section>
+</div>
+</main><footer>Private management · Cloudflare Access authentication required · No public booking enabled</footer>
+<script>
+const el=id=>document.getElementById(id);
+const status=text=>{el('status').textContent=text};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let data={staff:[],services:[],hours:[]};
+async function call(path,options={}){
+ const response=await fetch('/api/admin/'+path,{credentials:'same-origin',cache:'no-store',headers:{'content-type':'application/json'},...options});
+ const value=await response.json();if(!response.ok)throw Error(value.error||'Request failed');return value;
+}
+async function load(){
+ try{data=await call('overview');render();status('Studio configuration loaded. Changes are saved to the booking database.');}
+ catch(e){status('Unable to load administration: '+e.message);}
+}
+function render(){
+ el('staff-list').innerHTML=data.staff.length?data.staff.map(s=>'<div class="item"><div><b>'+esc(s.display_name)+'</b><small>'+esc(s.id)+' · '+(s.active?'Active':'Inactive')+'</small></div></div>').join(''):'<p class="muted">No barbers configured yet.</p>';
+ el('service-list').innerHTML=data.services.length?data.services.map(s=>'<div class="item"><div><b>'+esc(s.title)+'</b><small>'+s.duration_minutes+' min + '+s.buffer_minutes+' min buffer · '+(s.active?'Active':'Inactive')+'</small></div></div>').join(''):'<p class="muted">No services configured yet.</p>';
+ el('hour-barber').innerHTML=data.staff.filter(s=>s.active).map(s=>'<option value="'+esc(s.id)+'">'+esc(s.display_name)+'</option>').join('');
+ const weekdays=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+ el('hours-list').innerHTML=data.hours.length?data.hours.map(h=>'<div class="item"><div><b>'+esc(data.staff.find(s=>s.id===h.barber_id)?.display_name||h.barber_id)+'</b><small>'+weekdays[h.weekday]+' · '+esc(h.starts_at)+' – '+esc(h.ends_at)+'</small></div><button class="secondary" data-remove="'+esc(h.id)+'">Remove</button></div>').join(''):'<p class="muted">No working intervals configured yet.</p>';
+}
+async function save(form,path,make){
+ const button=form.querySelector('button');button.disabled=true;
+ try{await call(path,{method:'POST',body:JSON.stringify(make(new FormData(form)))});form.reset();await load();}
+ catch(e){status('Could not save: '+e.message);}
+ finally{button.disabled=false;}
+}
+el('staff-form').onsubmit=e=>{e.preventDefault();save(e.currentTarget,'staff',f=>({id:f.get('id'),display_name:f.get('display_name'),active:f.get('active')==='true'}));};
+el('services-form').onsubmit=e=>{e.preventDefault();save(e.currentTarget,'services',f=>({id:f.get('id'),title:f.get('title'),duration_minutes:Number(f.get('duration_minutes')),buffer_minutes:Number(f.get('buffer_minutes')),active:f.get('active')==='true'}));};
+el('hours-form').onsubmit=e=>{e.preventDefault();save(e.currentTarget,'hours',f=>({id:'hours-'+crypto.randomUUID().slice(0,20),barber_id:f.get('barber_id'),weekday:Number(f.get('weekday')),starts_at:f.get('starts_at'),ends_at:f.get('ends_at')}));};
+el('hours-list').onclick=async e=>{const id=e.target.dataset.remove;if(!id)return;if(!confirm('Remove this weekly interval?'))return;try{await call('hours/'+encodeURIComponent(id),{method:'DELETE'});await load();}catch(err){status('Could not remove: '+err.message);}};
+load();
+</script></body></html>
