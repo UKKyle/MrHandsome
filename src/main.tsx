@@ -413,6 +413,7 @@ function App() {
             <div className="hours">
               <h3>Opening hours</h3>
               {business.hours.map(([day,time]) => <div key={day}><span>{day}</span><strong>{time}</strong></div>)}
+              {previewOnly && <p className="preview-detail-note">Hours are indicative for this concept and will be confirmed before launch.</p>}
             </div>
           </div>
         </section>
