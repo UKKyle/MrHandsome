@@ -106,9 +106,9 @@ async function api(request:Request,env:Env,url:URL):Promise<Response> {
   if (method==='GET' && path==='/admin/api/slots') return json({slots:await getSlots(env,true)});
   if (method==='PATCH' && path==='/admin/api/bookings/barber') {
     const b=await body(request);
-    if(typeof b.date!=='string'||typeof b.time!=='string'||!/^\\d{4}-\\d{2}-\\d{2}$/.test(b.date)||!validTime(b.time))return json({error:'Invalid appointment'},400);
+    if(typeof b.date!=='string'||typeof b.time!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(b.date)||!validTime(b.time))return json({error:'Invalid appointment'},400);
     const barber=typeof b.barber==='string'?b.barber.trim():'';
-    if(barber.length>70||/[<>\\x00-\\x1f]/.test(barber))return json({error:'Invalid barber name'},400);
+    if(barber.length>70||/[<>\x00-\x1f]/.test(barber))return json({error:'Invalid barber name'},400);
     const result=await env.BOOKINGS_DB.prepare('UPDATE simple_bookings SET assigned_barber=? WHERE date=? AND time=?').bind(barber||null,b.date,b.time).run();
     if(!result.meta.changes)return json({error:'Appointment not found'},404);
     return json({ok:true});
