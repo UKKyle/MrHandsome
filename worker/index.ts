@@ -107,6 +107,10 @@ async function audit(env:Env,actor:string,action:string,target:string,details:Re
 }
 async function api(request:Request,env:Env,url:URL,actor:string):Promise<Response> {
   const path=url.pathname,method=request.method;
+  if (method==='GET' && path==='/admin/api/audit') {
+    const records=await env.BOOKINGS_DB.prepare('SELECT occurred_at,actor_email,action,target,details FROM admin_audit_log ORDER BY occurred_at DESC,id DESC LIMIT 100').all();
+    return json({events:records.results});
+  }
   if (method==='GET' && path==='/admin/api/slots') return json({slots:await getSlots(env,true)});
   if (method==='PATCH' && path==='/admin/api/bookings/barber') {
     const b=await body(request);
