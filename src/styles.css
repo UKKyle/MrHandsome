@@ -472,3 +472,10 @@ footer{background:#201812;border-top-color:rgba(208,173,122,.15)}
 .booking-modal-note{margin:24px 0;color:#bdad9c;font-size:12px;line-height:1.6}
 .booking-modal-dismiss{display:block;width:100%;margin-top:10px;min-height:46px;border:1px solid rgba(234,207,174,.35);border-radius:7px;background:transparent;color:#efddc8;font-size:13px;font-weight:750}
 @media(max-width:600px){.booking-modal-backdrop{padding:16px 16px max(16px,env(safe-area-inset-bottom))}.booking-modal{padding:29px 22px 22px}.booking-modal h2{margin-bottom:18px}}
+
+/* Optional verified email booking — active only when mail and bot protection are configured. */
+.services .simple-booking-form>input.booking-email-input{display:block;box-sizing:border-box;width:100%;height:52px;min-height:52px;padding:0 16px;background:#241b16;color:#f5f0e8;border:1px solid #78604b;border-radius:7px;font:inherit;font-size:15px}
+.services .simple-booking-form>input.booking-email-input:focus-visible{outline:2px solid #d0ad7a;outline-offset:2px}
+.services .simple-booking-form .booking-email-hint{margin:-8px 0 3px;color:#bfad9c;font-size:12px;line-height:1.5}
+.services .simple-booking-form .booking-turnstile{min-height:0}
+@media(max-width:760px){.services .simple-booking-form>input.booking-email-input{height:48px;min-height:48px}}
