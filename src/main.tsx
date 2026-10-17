@@ -2,11 +2,11 @@ import React, { FormEvent, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { CalendarDays, ChevronLeft, ChevronRight, MapPin, Menu, Phone, Star, X } from 'lucide-react';
 import './styles.css';
-const heroImage = '/images/hero.webp';
-const workImage1 = '/images/work-1.webp';
-const workImage2 = '/images/work-2.webp';
-const workImage3 = '/images/work-3.webp';
-const workImage4 = '/images/work-4.webp';
+const heroImage = '/images/template-hero.svg';
+const workImage1 = '/images/template-cut-1.svg';
+const workImage2 = '/images/template-cut-2.svg';
+const workImage3 = '/images/template-cut-3.svg';
+const workImage4 = '/images/template-cut-4.svg';
 
 const business = {
   name: 'Your Barbershop',
@@ -93,7 +93,7 @@ function App() {
 
   const unlock = (event: FormEvent) => {
     event.preventDefault();
-    if (pin === '4821') {
+    if (pin === '0000') {
       sessionStorage.setItem('mh-preview', '1');
       setUnlocked(true);
       setError('');
@@ -248,8 +248,8 @@ function App() {
             <div className="hero-bottom"><p className="hero-service-line">Haircuts · Fades · Beards · Shaves</p>
             <div className="rating-row">
               <div className="stars">{[0,1,2,3,4].map(i => <Star key={i} size={17} fill="currentColor" />)}</div>
-              <strong>{business.rating}</strong>
-              <span>{business.reviews} Google reviews</span>
+              <strong>{business.rating||'—'}</strong>
+              <span>{business.reviews||'—'} Google reviews</span>
             </div>
             <div className="hero-actions">
               <a className="hero-primary" href="#booking"><CalendarDays size={16} /> Book appointment</a>
@@ -263,11 +263,11 @@ function App() {
         </section>
 
         <section className="trust-strip" aria-label="Why visit Your Barbershop">
-          <a className="trust-item trust-reviews" href={business.googleMaps} target="_blank" rel="noopener noreferrer" aria-label={`Find Your Barbershop on Google Maps. Rating ${business.rating} out of 5 from ${business.reviews} Google reviews`}>
+          <a className="trust-item trust-reviews" href={business.googleMaps} target="_blank" rel="noopener noreferrer" aria-label={`Find Your Barbershop on Google Maps. Rating ${business.rating||'—'} out of 5 from ${business.reviews||'—'} Google reviews`}>
             <span className="trust-icon trust-google" aria-hidden="true">G</span>
             <span className="trust-copy">
-              <span className="trust-primary"><strong>{business.rating}<small>/5</small></strong><span className="trust-stars" aria-label="Five stars">{[0,1,2,3,4].map(i => <Star key={i} size={15} fill="currentColor" />)}</span></span>
-              <span className="trust-detail">{business.reviews} customer reviews <ChevronRight size={14} aria-hidden="true" /></span>
+              <span className="trust-primary"><strong>{business.rating||'—'}<small>/5</small></strong><span className="trust-stars" aria-label="Five stars">{[0,1,2,3,4].map(i => <Star key={i} size={15} fill="currentColor" />)}</span></span>
+              <span className="trust-detail">{business.reviews||'—'} customer reviews <ChevronRight size={14} aria-hidden="true" /></span>
             </span>
           </a>
           <a className="trust-item" href="#booking" aria-label="Open every day. View appointment availability and book online">
@@ -281,7 +281,7 @@ function App() {
             <span className="trust-icon" aria-hidden="true"><MapPin size={23} strokeWidth={1.6} /></span>
             <span className="trust-copy">
               <span className="trust-primary"><strong>25 The Green</strong></span>
-              <span className="trust-detail">King’s Norton · Directions <ChevronRight size={14} aria-hidden="true" /></span>
+              <span className="trust-detail">Your location · Directions <ChevronRight size={14} aria-hidden="true" /></span>
             </span>
           </a>
         </section>
@@ -317,10 +317,10 @@ function App() {
               <h2>A reputation already earned.</h2>
             </div>
             <div className="review-score">
-              <strong>{business.rating}</strong>
+              <strong>{business.rating||'—'}</strong>
               <div>
                 <div className="stars">{[0,1,2,3,4].map(i => <Star key={i} size={18} fill="currentColor" />)}</div>
-                <span>{business.reviews} Google reviews</span>
+                <span>{business.reviews||'—'} Google reviews</span>
               </div>
             </div>
           </div>
