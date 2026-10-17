@@ -131,16 +131,6 @@ function App() {
     return ()=>{document.body.style.overflow=previous;document.removeEventListener('keydown',onKey);};
   },[confirmationOpen]);
 
-  const calendarHref=bookingConfirmation?(()=>{
-    const start=bookingConfirmation.date.replace(/-/g,'')+'T'+bookingConfirmation.time.replace(':','')+'00';
-    const date=new Date(bookingConfirmation.date+'T12:00:00Z');
-    const [h,m]=bookingConfirmation.time.split(':').map(Number);
-    date.setUTCHours(h+1,m,0,0);
-    const end=date.toISOString().replace(/[-:]/g,'').slice(0,15);
-    const stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');
-    const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Mr Handsome//Bookings//EN','BEGIN:VEVENT','UID:'+bookingConfirmation.date+'-'+bookingConfirmation.time.replace(':','')+'@mrhandsome.local','DTSTAMP:'+stamp,'DTSTART;TZID=Europe/London:'+start,'DTEND;TZID=Europe/London:'+end,'SUMMARY:Mr Handsome appointment',"LOCATION:25 The Green, King's Norton, Birmingham B38 8SD",'DESCRIPTION:Barbershop appointment. Please arrive on time. Calendar duration is an estimate.','END:VEVENT','END:VCALENDAR'];
-    return 'data:text/calendar;charset=utf-8,'+encodeURIComponent(lines.join('\r\n'));
-  })():null;
   const bookingDates=[...new Set(availableSlots.map(slot=>slot.date))];
   const visibleTimes=availableSlots.filter(slot=>slot.date===(selectedDate ?? bookingDates[0]));
 
@@ -407,7 +397,6 @@ function App() {
           <p className="booking-modal-time">{new Date(bookingConfirmation.date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} at {bookingConfirmation.time}</p>
           <p className="booking-modal-address">Mr Handsome · 25 The Green, King's Norton</p>
           <p className="booking-modal-note">Your appointment is confirmed. No text or email will be sent, so save these details.</p>
-          {calendarHref && <a className="booking-modal-calendar" href={calendarHref} download="mr-handsome-appointment.ics"><CalendarDays size={18}/> Add to calendar</a>}
           <button className="booking-modal-dismiss" onClick={()=>setConfirmationOpen(false)}>Done</button>
         </div>
       </div>}
