@@ -227,14 +227,14 @@ function App() {
               <span className="trust-detail">{business.reviews} customer reviews <ChevronRight size={14} aria-hidden="true" /></span>
             </span>
           </a>
-          <div className="trust-item">
+          <a className="trust-item" href="#booking" aria-label="Open every day. View appointment availability and book online">
             <span className="trust-icon" aria-hidden="true"><CalendarDays size={23} strokeWidth={1.6} /></span>
             <span className="trust-copy">
               <span className="trust-eyebrow">OPEN EVERY DAY</span>
               <span className="trust-primary"><strong>Mon–Sun</strong></span>
               <span className="trust-detail">See appointments · Book online</span>
             </span>
-          </div>
+          </a>
           <a className="trust-item" href={business.googleMaps} target="_blank" rel="noopener noreferrer">
             <span className="trust-icon" aria-hidden="true"><MapPin size={23} strokeWidth={1.6} /></span>
             <span className="trust-copy">
