@@ -16,7 +16,7 @@ const business = {
   rating: 4.9,
   reviews: 290,
   facebook: 'https://www.facebook.com/427863107661555/',
-  googleMaps: "https://www.google.com/maps/search/?api=1&query=Mr%20Handsome%20Birmingham%2C%2025%20The%20Green%2C%20King%27s%20Norton%2C%20B38%208SD",
+  googleMaps: "https://maps.app.goo.gl/JHg152UBVmizcBJR6",
   googleEmbed: "https://www.google.com/maps?q=25+The+Green,+King's+Norton,+Birmingham+B38+8SD&output=embed",
   heroImage,
   hours: [
