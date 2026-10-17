@@ -491,3 +491,7 @@ footer{background:#201812;border-top-color:rgba(208,173,122,.15)}
  .pin-row{grid-template-columns:minmax(0,1fr);gap:12px}
  .pin-row button{width:100%;min-height:52px}
 }
+
+/* Discreet disclosure for details awaiting owner confirmation. */
+.visit-panel .preview-detail-note{margin:15px 0 0;color:#bea892;font-size:11px;line-height:1.55;max-width:380px}
+@media(max-width:600px){.visit-panel .preview-detail-note{font-size:11px;margin-top:14px}}
