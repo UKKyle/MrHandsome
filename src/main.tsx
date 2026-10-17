@@ -389,7 +389,7 @@ function App() {
                   <span>I understand that if I arrive late or miss my appointment, the barber may be unable to complete my service and may ask me to wait for the next available walk-in opportunity.</span>
                 </label>
                 {bookingError&&<p className="booking-form-error" role="alert">{bookingError}</p>}
-                <button className="booking-submit" type="submit" disabled={!bookingTime||!acceptedArrivalTerms||customerName.trim().length<2||(previewOnly&&!customerEmail.includes('@'))||(!previewOnly&&emailBooking&&(!customerEmail.includes('@')||!turnstileToken))||bookingSubmitting}>{bookingSubmitting?'Booking…':previewOnly?'Preview confirmation':'Confirm appointment'}</button>
+                <button className="booking-submit" type="submit" disabled={!bookingTime||!acceptedArrivalTerms||customerName.trim().length<2||(previewOnly&&!customerEmail.includes('@'))||(!previewOnly&&emailBooking&&(!customerEmail.includes('@')||!turnstileToken))||bookingSubmitting}>{bookingSubmitting?'Booking…':previewOnly?'See booking preview':'Confirm appointment'}</button>
                 <p className="booking-privacy">{previewOnly?'Concept preview only. No reservation is created, and the name or email entered here is not sent to the booking server.':<>Your booking details are stored so the shop can manage your appointment. To ask about your information or cancel, call <a href={business.phoneHref}>{business.phone}</a>. {emailBooking?'We will attempt to send an email confirmation.':'No email or SMS is sent.'}</>}</p>
               </form>}
 
@@ -427,11 +427,11 @@ function App() {
       {bookingConfirmation && confirmationOpen && <div className="booking-modal-backdrop" onMouseDown={event=>{if(event.target===event.currentTarget)setConfirmationOpen(false);}}>
         <div className="booking-modal" role="dialog" aria-modal="true" aria-labelledby="booking-confirmed-title" tabIndex={-1} ref={confirmationDialogRef}>
           <div className="booking-modal-check" aria-hidden="true">{previewOnly?'i':'✓'}</div>
-          <h2 id="booking-confirmed-title">{previewOnly?'PREVIEW ONLY':"You're booked in."}</h2>
+          <h2 id="booking-confirmed-title">{previewOnly?'Booking preview complete':"You're booked in."}</h2>
           <p className="booking-modal-name">{bookingConfirmation.name}</p>
           <p className="booking-modal-time">{new Date(bookingConfirmation.date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} at {bookingConfirmation.time}</p>
           <p className="booking-modal-address">Mr Handsome · 25 The Green, King's Norton</p>
-          <p className="booking-modal-note">{previewOnly?'This is a demonstration of the booking experience. No appointment has been made and no email has been sent.':emailBooking?(bookingConfirmation.emailSent?'A confirmation email is on its way. Please also keep these details.':'Your booking is confirmed, but the email could not be sent. Please save these details.'):'Your appointment is confirmed. No text or email will be sent, so save these details.'}</p>
+          <p className="booking-modal-note">{previewOnly?'PREVIEW ONLY — This demonstrates the confirmation customers would see after booking. No appointment has been reserved and no email has been sent.':emailBooking?(bookingConfirmation.emailSent?'A confirmation email is on its way. Please also keep these details.':'Your booking is confirmed, but the email could not be sent. Please save these details.'):'Your appointment is confirmed. No text or email will be sent, so save these details.'}</p>
           <button className="booking-modal-dismiss" onClick={()=>setConfirmationOpen(false)}>Done</button>
         </div>
       </div>}
