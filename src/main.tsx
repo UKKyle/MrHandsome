@@ -170,7 +170,16 @@ function App() {
   return (
     <div className="site">
       <a className="skip-link" href="#booking">Skip to booking</a>
-      <div className="preview-note">Private concept preview — not the live Mr Handsome website</div>
+      <div className="preview-note preview-ticker" role="region" aria-label="Mr Handsome announcements">
+        <div className="preview-ticker-track" aria-hidden="true">
+          {[0,1,2,3].map(i => <div className="preview-ticker-set" key={i}>
+            <span>BOOKINGS AVAILABLE</span><span className="ticker-dot">✦</span>
+            <span>YOUR TRUSTED NEIGHBOURHOOD BARBER</span><span className="ticker-dot">✦</span>
+            <span>PRIVATE CONCEPT WEBSITE</span><span className="ticker-dot">✦</span>
+          </div>)}
+        </div>
+        <span className="sr-only">Bookings available. Your trusted neighbourhood barber. Private concept website, not the live business website.</span>
+      </div>
 
       <header>
         <button className="brand" onClick={() => go('top')}>MR HANDSOME</button>
