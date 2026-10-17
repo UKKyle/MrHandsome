@@ -18,7 +18,7 @@ e('today-label').textContent=dateLabel(today,{weekday:'long',day:'numeric',month
 async function request(method,path,payload){const r=await fetch('/admin/api/'+path,{method,credentials:'same-origin',cache:'no-store',headers:{'content-type':'application/json'},body:payload?JSON.stringify(payload):undefined});const ct=r.headers.get('content-type')||'';if(!ct.includes('application/json'))throw Error('Your admin session may have expired. Refresh this page and sign in again.');const data=await r.json();if(r.status===401||r.status===403)throw Error('Your admin session is no longer authorised. Refresh the page and sign in again.');if(!r.ok)throw Error(data.error||'Unable to complete request');return data;}
 function setMode(next){mode=next;for(const n of ['bookings','availability','audit']){e('nav-'+n).classList.toggle('active',n===mode);e(n+'-panel').classList.toggle('hidden',n!==mode);}e('stats').classList.toggle('hidden',mode==='audit');e('page-title').textContent=mode==='audit'?'Activity Log':mode==='bookings'?'Bookings':'Availability';e('page-subtitle').textContent=mode==='audit'?'A record of changes made in the studio.':mode==='bookings'?'Your appointments, at a glance.':'Control which appointment times customers can book.';if(mode==='audit')loadAudit();else render();}
 e('nav-bookings').onclick=()=>setMode('bookings');e('nav-availability').onclick=()=>setMode('availability');e('nav-audit').onclick=()=>setMode('audit');
-const activityNames={assign_barber:'Barber assignment updated',cancel_booking:'Appointment cancelled',block_slot:'Time marked unavailable',unblock_slot:'Time reopened'};
+const activityNames={new_booking:'New booking received',assign_barber:'Barber assignment updated',cancel_booking:'Appointment cancelled',block_slot:'Time marked unavailable',unblock_slot:'Time reopened'};
 async function loadAudit(){
  const container=e('audit-events');container.replaceChildren();const loading=document.createElement('p');loading.className='empty';loading.textContent='Loading activity…';container.append(loading);
  try{const data=await request('GET','audit');container.replaceChildren();if(!data.events?.length){const empty=document.createElement('p');empty.className='empty';empty.textContent='No administrator activity recorded yet.';container.append(empty);return;}
@@ -28,7 +28,7 @@ async function loadAudit(){
  const content=document.createElement('div');content.className='audit-item-content';
  const title=document.createElement('strong');title.textContent=activityNames[record.action]||record.action;
  const target=document.createElement('div');target.className='audit-target';target.textContent=record.target||'—';
- const actor=document.createElement('div');actor.className='audit-actor';actor.textContent='By '+(record.actor_email||'Administrator');
+ const actor=document.createElement('div');actor.className='audit-actor';actor.textContent=record.action==='new_booking'?'Source: online booking':('By '+(record.actor_email||'Administrator'));
  const time=document.createElement('time');time.className='audit-time';time.textContent=new Date(String(record.occurred_at).replace(' ','T')+'Z').toLocaleString('en-GB',{timeZone:'Europe/London',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
  content.append(title,target,actor);item.append(dot,content,time);container.append(item);
  }
