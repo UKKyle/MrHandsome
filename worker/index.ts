@@ -83,6 +83,7 @@ async function getSlots(env:Env,includeBlocked:boolean) {
   return all.filter(x=>includeBlocked||(!isBlocked(x)&&!reservations.has(x.date+'|'+x.time))).map(x=>({...x,blocked:isBlocked(x),booked:reservations.has(x.date+'|'+x.time),customer_name:includeBlocked?(reservations.get(x.date+'|'+x.time)?.customer_name??null):undefined,assigned_barber:includeBlocked?(reservations.get(x.date+'|'+x.time)?.assigned_barber??null):undefined}));
 }
 
+const PREVIEW_ONLY=true; // Deliberate fail-closed demo mode. Disable only during an authorised production launch.
 const emailEnabled=(env:Env)=>Boolean(env.RESEND_API_KEY&&env.BOOKING_FROM_EMAIL&&env.TURNSTILE_SITE_KEY&&env.TURNSTILE_SECRET_KEY);
 const safeHtml=(s:string)=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c));
 async function verifyTurnstile(token:string,request:Request,env:Env) {
@@ -182,7 +183,7 @@ export default {
  async fetch(request:Request, env:Env):Promise<Response> {
   const url=new URL(request.url);
   const isAdmin=url.pathname==='/admin'||url.pathname.startsWith('/admin/')||url.pathname.startsWith('/admin/api/');
-  if (url.pathname==='/api/booking-config' && request.method==='GET') return json({emailEnabled:emailEnabled(env),turnstileSiteKey:emailEnabled(env)?env.TURNSTILE_SITE_KEY:null});
+  if (url.pathname==='/api/booking-config' && request.method==='GET') return json({previewOnly:PREVIEW_ONLY,emailEnabled:emailEnabled(env),turnstileSiteKey:emailEnabled(env)?env.TURNSTILE_SITE_KEY:null});
   if (url.pathname==='/api/slots' && request.method==='GET') {
     if(!env.BOOKINGS_DB)return json({slots:[]},503);
     try {return json({slots:(await getSlots(env,false)).map(({date,time})=>({date,time}))});}
@@ -190,6 +191,7 @@ export default {
   }
   if(url.pathname==='/api/bookings' && request.method==='POST') {
     if(!env.BOOKINGS_DB)return json({error:'Bookings unavailable'},503);
+    if(PREVIEW_ONLY)return json({previewOnly:true,error:'PREVIEW ONLY — appointments cannot be booked through this demonstration.'},409);
     try {
       if(request.headers.get('content-type')?.split(';')[0]!=='application/json')return json({error:'Invalid request'},415);
       const input=await body(request);
@@ -198,7 +200,7 @@ export default {
       const useEmail=emailEnabled(env);
       const email=typeof input.email==='string'?input.email.trim().toLowerCase():'';
       if(useEmail){
-        if(email.length>254||/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({error:'Enter a valid email address'},400);
+        if(email.length>254||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({error:'Enter a valid email address'},400);
         if(typeof input.turnstile_token!=='string'||!(await verifyTurnstile(input.turnstile_token,request,env)))return json({error:'Please complete the booking security check and try again.'},403);
       }
       if(name.length<2||name.length>80||/[<>\x00-\x1f]/.test(name)||typeof date!=='string'||typeof time!=='string'||input.accepted_terms!==true) return json({error:'Enter your name and accept the arrival terms'},400);
