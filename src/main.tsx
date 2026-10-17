@@ -137,9 +137,9 @@ function App() {
     const [h,m]=bookingConfirmation.time.split(':').map(Number);
     date.setUTCHours(h+1,m,0,0);
     const end=date.toISOString().replace(/[-:]/g,'').slice(0,15);
-    const stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\\.\\d{3}Z$/,'Z');
-    const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Mr Handsome//Bookings//EN','BEGIN:VEVENT','UID:'+bookingConfirmation.date+'-'+bookingConfirmation.time.replace(':','')+'@mrhandsome.local','DTSTAMP:'+stamp,'DTSTART;TZID=Europe/London:'+start,'DTEND;TZID=Europe/London:'+end,'SUMMARY:Mr Handsome appointment','LOCATION:25 The Green\\, King\\'s Norton\\, Birmingham B38 8SD','DESCRIPTION:Barbershop appointment. Please arrive on time. Calendar duration is an estimate.','END:VEVENT','END:VCALENDAR'];
-    return 'data:text/calendar;charset=utf-8,'+encodeURIComponent(lines.join('\\r\\n'));
+    const stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');
+    const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Mr Handsome//Bookings//EN','BEGIN:VEVENT','UID:'+bookingConfirmation.date+'-'+bookingConfirmation.time.replace(':','')+'@mrhandsome.local','DTSTAMP:'+stamp,'DTSTART;TZID=Europe/London:'+start,'DTEND;TZID=Europe/London:'+end,'SUMMARY:Mr Handsome appointment',"LOCATION:25 The Green, King's Norton, Birmingham B38 8SD",'DESCRIPTION:Barbershop appointment. Please arrive on time. Calendar duration is an estimate.','END:VEVENT','END:VCALENDAR'];
+    return 'data:text/calendar;charset=utf-8,'+encodeURIComponent(lines.join('\r\n'));
   })():null;
   const bookingDates=[...new Set(availableSlots.map(slot=>slot.date))];
   const visibleTimes=availableSlots.filter(slot=>slot.date===(selectedDate ?? bookingDates[0]));
