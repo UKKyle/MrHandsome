@@ -223,7 +223,6 @@ function App() {
           <a className="trust-item trust-reviews" href={business.googleMaps} target="_blank" rel="noopener noreferrer" aria-label={`Find Mr Handsome on Google Maps. Rating ${business.rating} out of 5 from ${business.reviews} Google reviews`}>
             <span className="trust-icon trust-google" aria-hidden="true">G</span>
             <span className="trust-copy">
-              <span className="trust-eyebrow">RATED ON GOOGLE</span>
               <span className="trust-primary"><strong>{business.rating}<small>/5</small></strong><span className="trust-stars" aria-label="Five stars">{[0,1,2,3,4].map(i => <Star key={i} size={15} fill="currentColor" />)}</span></span>
               <span className="trust-detail">{business.reviews} customer reviews <ChevronRight size={14} aria-hidden="true" /></span>
             </span>
@@ -231,7 +230,6 @@ function App() {
           <a className="trust-item" href="#booking" aria-label="Open every day. View appointment availability and book online">
             <span className="trust-icon" aria-hidden="true"><CalendarDays size={23} strokeWidth={1.6} /></span>
             <span className="trust-copy">
-              <span className="trust-eyebrow">OPEN EVERY DAY</span>
               <span className="trust-primary"><strong>Mon–Sun</strong></span>
               <span className="trust-detail">See appointments · Book online</span>
             </span>
@@ -239,7 +237,6 @@ function App() {
           <a className="trust-item" href={business.googleMaps} target="_blank" rel="noopener noreferrer">
             <span className="trust-icon" aria-hidden="true"><MapPin size={23} strokeWidth={1.6} /></span>
             <span className="trust-copy">
-              <span className="trust-eyebrow">FIND THE SHOP</span>
               <span className="trust-primary"><strong>25 The Green</strong></span>
               <span className="trust-detail">King’s Norton · Directions <ChevronRight size={14} aria-hidden="true" /></span>
             </span>
@@ -249,7 +246,6 @@ function App() {
         <section className="work-showcase" id="work">
           <div className="work-head">
             <div>
-              <p className="section-kicker">Recent work</p>
               <h2>Recent cuts.</h2>
             </div>
             <div className="work-controls" aria-label="Browse recent work">
@@ -275,7 +271,6 @@ function App() {
         <section className="reviews" id="reviews">
           <div className="reviews-head">
             <div>
-              <p className="section-kicker">Customer reviews</p>
               <h2>A reputation already earned.</h2>
             </div>
             <div className="review-score">
@@ -306,13 +301,11 @@ function App() {
         <section className="services" id="services">
           <div className="services-shell">
             <div className="services-copy">
-              <p className="section-kicker">Appointments</p>
               <h2>Book your next visit.</h2>
-              <p>Choose a time, enter your name and you’re booked. No account required.</p>
             </div>
             <div className="booking-preview simple-booking" id="booking" aria-label="Upcoming appointment availability">
               <div className="booking-preview-head">
-                <div><span className="booking-step">MR HANDSOME · KING'S NORTON</span><h3>Choose your appointment.</h3></div>
+                <div><h3>Choose your appointment.</h3></div>
               </div>
               <div className="booking-phone-option"><span>Prefer to book by phone?</span><a href={business.phoneHref} aria-label={`Call Mr Handsome on ${business.phone}`}><Phone size={16}/> <span>{business.phone}</span></a></div>
               {!bookingConfirmation && (!slotsLoaded ? <p className="simple-booking-empty">Checking upcoming availability…</p> :
