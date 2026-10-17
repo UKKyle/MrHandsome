@@ -107,5 +107,6 @@ async function assignBarber(s){
 }
 async function cancelBooking(s){if(!confirm('Cancel '+s.customer_name+' at '+s.time+'? This will release the appointment.'))return;e('status').textContent='Cancelling…';try{await request('DELETE','bookings',{date:s.date,time:s.time});await reload();e('status').textContent='Booking cancelled';}catch(err){e('status').textContent=err.message;}}
 async function reload(){try{const data=await request('GET','slots');slots=data.slots||[];render();}catch(err){e('status').textContent='Unable to load calendar: '+err.message;}}
-reload();
+async function initialise(){try{const response=await fetch('/api/booking-config',{cache:'no-store'});if(response.ok){const config=await response.json();demoMode=config.previewOnly!==false;}}catch{/* Keep illustrative data if setup is unavailable. */}await reload();}
+initialise();
 </script></body></html>
