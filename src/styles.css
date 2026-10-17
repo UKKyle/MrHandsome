@@ -479,3 +479,15 @@ footer{background:#201812;border-top-color:rgba(208,173,122,.15)}
 .services .simple-booking-form .booking-email-hint{margin:-8px 0 3px;color:#bfad9c;font-size:12px;line-height:1.5}
 .services .simple-booking-form .booking-turnstile{min-height:0}
 @media(max-width:760px){.services .simple-booking-form>input.booking-email-input{height:48px;min-height:48px}}
+
+/* Private concept gate: full-sized, balanced mobile CTA and accessible entry field. */
+.gate-panel{width:min(550px,100%);border-radius:12px}
+.pin-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(118px,auto);align-items:stretch;gap:10px}
+.pin-row input{width:100%;min-width:0;min-height:52px;border-radius:6px}
+.pin-row button{min-height:52px;display:flex;align-items:center;justify-content:center;white-space:nowrap;border-radius:6px;padding:0 23px;font-weight:800}
+.pin-row input:focus-visible,.pin-row button:focus-visible{outline:2px solid #d0ad7a;outline-offset:3px}
+@media(max-width:600px){
+ .gate-panel{padding:32px 24px}
+ .pin-row{grid-template-columns:minmax(0,1fr);gap:12px}
+ .pin-row button{width:100%;min-height:52px}
+}
