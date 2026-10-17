@@ -460,3 +460,17 @@ footer{background:#201812;border-top-color:rgba(208,173,122,.15)}
  .mobile-actions{background:#241a14;border-top-color:rgba(208,173,122,.2)}
 }
 @media(min-width:601px) and (max-width:760px){.mobile-actions{background:#241a14;border-top-color:rgba(208,173,122,.2)}}
+
+/* Booking completion: fixed, focused confirmation rather than a page jump. */
+.booking-modal-backdrop{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(17,11,8,.78);backdrop-filter:blur(7px)}
+.booking-modal{width:min(450px,100%);max-height:calc(100dvh - 40px);overflow-y:auto;outline:none;padding:36px 30px 28px;background:#32251d;border:1px solid rgba(208,173,122,.42);border-radius:15px;box-shadow:0 28px 90px rgba(0,0,0,.5);text-align:center}
+.booking-modal-check{display:grid;place-items:center;margin:0 auto 16px;width:49px;height:49px;border-radius:50%;background:#c29a67;color:#241911;font-size:26px;font-weight:700}
+.booking-modal h2{margin:0 0 20px;font-family:Georgia,serif;font-size:clamp(29px,6vw,39px);font-weight:400;letter-spacing:-.035em}
+.booking-modal-name{margin:0 0 7px;color:#e8d9c7;font-size:15px}
+.booking-modal-time{margin:0;color:#f6e9d9;font-size:18px;line-height:1.45;font-weight:700}
+.booking-modal-address{margin:10px 0 0;color:#cbb9a7;font-size:12px}
+.booking-modal-note{margin:24px 0;color:#bdad9c;font-size:12px;line-height:1.6}
+.booking-modal-calendar{display:flex;justify-content:center;align-items:center;gap:9px;min-height:52px;padding:12px 18px;border-radius:7px;background:#c29a67;color:#241911;text-decoration:none;font-size:14px;font-weight:800}
+.booking-modal-calendar:hover{background:#d4aa74}
+.booking-modal-dismiss{display:block;width:100%;margin-top:10px;min-height:46px;border:1px solid rgba(234,207,174,.35);border-radius:7px;background:transparent;color:#efddc8;font-size:13px;font-weight:750}
+@media(max-width:600px){.booking-modal-backdrop{padding:16px 16px max(16px,env(safe-area-inset-bottom))}.booking-modal{padding:29px 22px 22px}.booking-modal h2{margin-bottom:18px}}
