@@ -178,7 +178,7 @@ export default {
       const useEmail=emailEnabled(env);
       const email=typeof input.email==='string'?input.email.trim().toLowerCase():'';
       if(useEmail){
-        if(email.length>254||/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return json({error:'Enter a valid email address'},400);
+        if(email.length>254||/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({error:'Enter a valid email address'},400);
         if(typeof input.turnstile_token!=='string'||!(await verifyTurnstile(input.turnstile_token,request,env)))return json({error:'Please complete the booking security check and try again.'},403);
       }
       if(name.length<2||name.length>80||/[<>\x00-\x1f]/.test(name)||typeof date!=='string'||typeof time!=='string'||input.accepted_terms!==true) return json({error:'Enter your name and accept the arrival terms'},400);
