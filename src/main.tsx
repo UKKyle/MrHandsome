@@ -326,7 +326,7 @@ function App() {
                       <strong>{new Date(date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</strong>
                     </button>)}
                   </div>
-                  <p className="simple-booking-label">Available times · 60-minute appointments</p>
+                  <p className="simple-booking-label">Available times</p>
                   <div className="simple-booking-times">
                     {visibleTimes.map(slot=><button type="button" key={slot.time} className={bookingTime===slot.time?'selected':''} aria-pressed={bookingTime===slot.time} onClick={()=>setBookingTime(slot.time)}>{slot.time}</button>)}
                   </div>
