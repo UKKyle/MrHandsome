@@ -191,6 +191,7 @@ function App() {
           <a href={business.facebook} target="_blank" rel="noreferrer">Facebook</a>
         </nav>
         <a className="header-cta" href="#booking">BOOK APPOINTMENT</a>
+        <a className="mobile-header-book" href="#booking" aria-label="View appointment availability"><CalendarDays size={15} aria-hidden="true" /> <span>Book</span></a>
         <button className="menu-button" aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen} onClick={() => setMenuOpen(v => !v)}>
           {menuOpen ? <X /> : <Menu />}
         </button>
