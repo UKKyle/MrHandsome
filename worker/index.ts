@@ -231,7 +231,7 @@ export default {
   headers.set('X-Content-Type-Options','nosniff');
   headers.set('Referrer-Policy','no-referrer');
   headers.set('X-Frame-Options','DENY');
-  headers.set('Content-Security-Policy',\"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; form-action 'self'; base-uri 'none'; frame-ancestors 'none'\");
+  headers.set('Content-Security-Policy',"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; form-action 'self'; base-uri 'none'; frame-ancestors 'none'");
   return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
  }
 };
