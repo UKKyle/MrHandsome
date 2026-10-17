@@ -209,6 +209,11 @@ export default {
       )`).bind(date,time,name,useEmail?email:null,date,time,
         `${String(Math.floor((Number(time.slice(0,2))*60+Number(time.slice(3,5))+60)/60)).padStart(2,'0')}:${String((Number(time.slice(0,2))*60+Number(time.slice(3,5))+60)%60).padStart(2,'0')}`).run();
       if(!result.meta.changes)return json({error:'This time is no longer available'},409);
+      // Log the appointment after the successful insert. Audit failures must not
+      // cause the customer to retry a booking that already exists.
+      try {await audit(env,'customer_booking','new_booking',date+' '+time);} catch (error) {
+        console.error('Unable to record new-booking audit event',error);
+      }
       let emailSent=false;
       if(useEmail){try{emailSent=await sendConfirmation(env,email,name,date,time);}catch{ /* Appointment remains booked; report email delivery acceptance accurately. */ }}
       return json({ok:true,date,time,emailSent});
