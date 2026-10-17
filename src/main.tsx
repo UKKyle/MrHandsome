@@ -70,6 +70,7 @@ function App() {
   const [bookingTime, setBookingTime] = useState<string | null>(null);
   const [customerName, setCustomerName] = useState('');
   const [acceptedArrivalTerms, setAcceptedArrivalTerms] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
   const [customerEmail,setCustomerEmail] = useState('');
   const [emailBooking,setEmailBooking] = useState(false);
   const [previewOnly,setPreviewOnly] = useState(true);
@@ -384,10 +385,10 @@ function App() {
                   <p className="booking-email-hint">{previewOnly?'Demo only — no email is sent or stored. In the live version, confirmation details are emailed here.':"We'll email your appointment details here. No account needed."}</p>
                   {!previewOnly && <div className="booking-turnstile" ref={turnstileContainer} aria-label="Booking security verification"/>}
                 </>}
-                <label className="booking-agreement">
-                  <input type="checkbox" checked={acceptedArrivalTerms} onChange={e=>setAcceptedArrivalTerms(e.target.checked)} required/>
-                  <span>I understand that if I arrive late or miss my appointment, the barber may be unable to complete my service and may ask me to wait for the next available walk-in opportunity.</span>
-                </label>
+                <div className="booking-agreement terms-agreement">
+                  <label htmlFor="booking-accept-terms"><input id="booking-accept-terms" type="checkbox" checked={acceptedArrivalTerms} onChange={e=>setAcceptedArrivalTerms(e.target.checked)} required/><span>I have read and accept the</span></label>
+                  <button type="button" className="terms-link" onClick={()=>setTermsOpen(true)} aria-haspopup="dialog">Terms &amp; Conditions</button>
+                </div>
                 {bookingError&&<p className="booking-form-error" role="alert">{bookingError}</p>}
                 <button className="booking-submit" type="submit" disabled={!bookingTime||!acceptedArrivalTerms||customerName.trim().length<2||(previewOnly&&!customerEmail.includes('@'))||(!previewOnly&&emailBooking&&(!customerEmail.includes('@')||!turnstileToken))||bookingSubmitting}>{bookingSubmitting?'Booking…':previewOnly?'See booking preview':'Confirm appointment'}</button>
                 <p className="booking-privacy">{previewOnly?'Concept preview only. No reservation is created, and the name or email entered here is not sent to the booking server.':<>Your booking details are stored so the shop can manage your appointment. To ask about your information or cancel, call <a href={business.phoneHref}>{business.phone}</a>. {emailBooking?'We will attempt to send an email confirmation.':'No email or SMS is sent.'}</>}</p>
@@ -425,6 +426,18 @@ function App() {
         <div className="footer-links"><a href={business.phoneHref}>Call {business.phone}</a><a href={business.googleMaps} target="_blank" rel="noreferrer">Directions</a><a href={business.facebook} target="_blank" rel="noreferrer">Facebook</a></div>
       </footer>
 
+      {termsOpen && <div className="terms-backdrop" onMouseDown={event=>{if(event.target===event.currentTarget)setTermsOpen(false);}}>
+        <div className="terms-dialog" role="dialog" aria-modal="true" aria-labelledby="terms-heading">
+          <div className="terms-dialog-head"><div><span className="terms-eyebrow">MR HANDSOME · APPOINTMENTS</span><h2 id="terms-heading">Terms &amp; Conditions</h2></div><button type="button" className="terms-close" onClick={()=>setTermsOpen(false)} aria-label="Close terms">×</button></div>
+          <div className="terms-dialog-body">
+            <h3>Arriving for your appointment</h3><p>Please arrive at your selected time. If you arrive late or miss your appointment, the barber may be unable to complete your service and may ask you to wait for the next available walk-in opportunity.</p>
+            <h3>Changing or cancelling</h3><p>If you need to change or cancel your appointment, please telephone the shop on <a href={business.phoneHref}>{business.phone}</a> as soon as possible. Online changes and cancellations are not currently offered.</p>
+            <h3>Your details and confirmation</h3><p>When live bookings are enabled, your name, email address and appointment details are used to arrange and manage the appointment. Your email address is also used to send a booking confirmation when email delivery is available. This is not consent to marketing emails.</p>
+            <h3>About this preview</h3><p>{previewOnly?'This website is a private demonstration. Completing the form will show an example confirmation only: no appointment is made, no email is sent and your details are not submitted to the booking service.':'Your appointment is only confirmed once you receive the booking confirmation on screen. Email delivery may be delayed or unavailable.'}</p>
+          </div>
+          <button type="button" className="terms-done" onClick={()=>setTermsOpen(false)}>Close terms</button>
+        </div>
+      </div>}
       {bookingConfirmation && confirmationOpen && <div className="booking-modal-backdrop" onMouseDown={event=>{if(event.target===event.currentTarget)setConfirmationOpen(false);}}>
         <div className="booking-modal" role="dialog" aria-modal="true" aria-labelledby="booking-confirmed-title" tabIndex={-1} ref={confirmationDialogRef}>
           <div className="booking-modal-check" aria-hidden="true">{previewOnly?'i':'✓'}</div>
