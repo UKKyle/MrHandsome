@@ -6,6 +6,10 @@ interface Env {
   ACCESS_TEAM_DOMAIN?: string;
   ACCESS_AUD?: string;
   ADMIN_EMAILS?: string;
+  RESEND_API_KEY?: string;
+  BOOKING_FROM_EMAIL?: string;
+  TURNSTILE_SITE_KEY?: string;
+  TURNSTILE_SECRET_KEY?: string;
 }
 
 const json = (value: unknown, status = 200) => new Response(JSON.stringify(value), {
@@ -79,6 +83,24 @@ async function getSlots(env:Env,includeBlocked:boolean) {
   return all.filter(x=>includeBlocked||(!isBlocked(x)&&!reservations.has(x.date+'|'+x.time))).map(x=>({...x,blocked:isBlocked(x),booked:reservations.has(x.date+'|'+x.time),customer_name:includeBlocked?(reservations.get(x.date+'|'+x.time)??null):undefined}));
 }
 
+const emailEnabled=(env:Env)=>Boolean(env.RESEND_API_KEY&&env.BOOKING_FROM_EMAIL&&env.TURNSTILE_SITE_KEY&&env.TURNSTILE_SECRET_KEY);
+const safeHtml=(s:string)=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c));
+async function verifyTurnstile(token:string,request:Request,env:Env) {
+  if(!env.TURNSTILE_SECRET_KEY||!token)return false;
+  const form=new URLSearchParams({secret:env.TURNSTILE_SECRET_KEY,response:token});
+  const ip=request.headers.get('CF-Connecting-IP');if(ip)form.set('remoteip',ip);
+  const res=await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',body:form});
+  if(!res.ok)return false;
+  const data=await res.json() as {success?:boolean};
+  return data.success===true;
+}
+async function sendConfirmation(env:Env,email:string,name:string,date:string,time:string) {
+ const pretty=new Date(date+'T12:00:00Z').toLocaleDateString('en-GB',{timeZone:'UTC',weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ const details={date:pretty,time,shop:"Mr Handsome",address:"25 The Green, King's Norton, Birmingham B38 8SD"};
+ const html=`<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;background:#f5f1ea;font-family:Arial,Helvetica,sans-serif;color:#2b211a"><table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="padding:36px 15px"><tr><td align="center"><table role="presentation" width="100%" style="max-width:520px;background:#fff;border:1px solid #e8dcd0;border-radius:12px;padding:35px"><tr><td><p style="font-size:12px;letter-spacing:3px;color:#987048;font-weight:bold">MR HANDSOME</p><h1 style="font-size:30px;margin:30px 0 15px">You're booked in.</h1><p>Hi ${safeHtml(name)},</p><p>Your appointment is confirmed. Here are your details:</p><div style="background:#f5f1ea;padding:20px;border-radius:8px;margin:24px 0"><strong>${safeHtml(details.date)}</strong><br><span style="font-size:24px;font-weight:bold">${safeHtml(details.time)}</span><p style="margin-bottom:0">${safeHtml(details.shop)}<br>${safeHtml(details.address)}</p></div><p>Please arrive on time. If you need to cancel or change your appointment, contact the shop on <a style="color:#80603e" href="tel:+441214483870">0121 448 3870</a>.</p><p style="font-size:12px;color:#776d64;margin-top:30px">This message confirms a booking you made. It is not a marketing email.</p></td></tr></table></td></tr></table></body></html>`;
+ const res=await fetch('https://api.resend.com/emails',{method:'POST',headers:{Authorization:'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({from:env.BOOKING_FROM_EMAIL,to:[email],subject:'Your Mr Handsome appointment — '+pretty,html})});
+ return res.ok;
+}
 async function api(request:Request,env:Env,url:URL):Promise<Response> {
   const path=url.pathname,method=request.method;
   if (method==='GET' && path==='/admin/api/slots') return json({slots:await getSlots(env,true)});
@@ -140,6 +162,7 @@ export default {
  async fetch(request:Request, env:Env):Promise<Response> {
   const url=new URL(request.url);
   const isAdmin=url.pathname==='/admin'||url.pathname.startsWith('/admin/')||url.pathname.startsWith('/admin/api/');
+  if (url.pathname==='/api/booking-config' && request.method==='GET') return json({emailEnabled:emailEnabled(env),turnstileSiteKey:emailEnabled(env)?env.TURNSTILE_SITE_KEY:null});
   if (url.pathname==='/api/slots' && request.method==='GET') {
     if(!env.BOOKINGS_DB)return json({slots:[]},503);
     try {return json({slots:(await getSlots(env,false)).map(({date,time})=>({date,time}))});}
@@ -152,15 +175,23 @@ export default {
       const input=await body(request);
       const name=typeof input.name==='string'?input.name.trim().replace(/\s+/g,' '):'';
       const date=input.date,time=input.time;
+      const useEmail=emailEnabled(env);
+      const email=typeof input.email==='string'?input.email.trim().toLowerCase():'';
+      if(useEmail){
+        if(email.length>254||/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return json({error:'Enter a valid email address'},400);
+        if(typeof input.turnstile_token!=='string'||!(await verifyTurnstile(input.turnstile_token,request,env)))return json({error:'Please complete the booking security check and try again.'},403);
+      }
       if(name.length<2||name.length>80||/[<>\x00-\x1f]/.test(name)||typeof date!=='string'||typeof time!=='string'||input.accepted_terms!==true) return json({error:'Enter your name and accept the arrival terms'},400);
       if(!(await getSlots(env,false)).some(x=>x.date===date&&x.time===time))return json({error:'This time is no longer available. Please choose another.'},409);
       // Unique (date,time) is enforced in D1 even under simultaneous requests.
-      const result=await env.BOOKINGS_DB.prepare(`INSERT INTO simple_bookings(date,time,customer_name) SELECT ?,?,? WHERE NOT EXISTS (
+      const result=await env.BOOKINGS_DB.prepare(`INSERT INTO simple_bookings(date,time,customer_name,customer_email) SELECT ?,?,?,? WHERE NOT EXISTS (
         SELECT 1 FROM blocked_slots WHERE date=? AND time>=? AND time<?
-      )`).bind(date,time,name,date,time,
+      )`).bind(date,time,name,useEmail?email:null,date,time,
         `${String(Math.floor((Number(time.slice(0,2))*60+Number(time.slice(3,5))+60)/60)).padStart(2,'0')}:${String((Number(time.slice(0,2))*60+Number(time.slice(3,5))+60)%60).padStart(2,'0')}`).run();
       if(!result.meta.changes)return json({error:'This time is no longer available'},409);
-      return json({ok:true,date,time});
+      let emailSent=false;
+      if(useEmail){try{emailSent=await sendConfirmation(env,email,name,date,time);}catch{ /* Appointment remains booked; report email delivery acceptance accurately. */ }}
+      return json({ok:true,date,time,emailSent});
     } catch {return json({error:'This time could not be booked. Refresh availability and try again.'},409);}
   }
   if (!isAdmin) return env.ASSETS.fetch(request);
