@@ -414,3 +414,49 @@ button:focus-visible,a:focus-visible{outline:2px solid #e4bc84;outline-offset:3p
  .reviews-head{margin-bottom:23px}
  .services .simple-booking .booking-preview-head{padding-bottom:15px}
 }
+
+/* Smoked oak colour grade — warm depth without faux wood textures.
+   Deep surfaces are brown-black rather than neutral black; brass stays restrained. */
+:root{
+ --black:#19130f;
+ --charcoal:#241b16;
+ --walnut:#30231c;
+ --walnut2:#382920;
+ --brass:#c29a67;
+ --brass2:#d0ad7a;
+ --muted:#b5a79a;
+ --line:rgba(226,203,177,.15);
+}
+body{background:#241b16}
+.site{background:linear-gradient(180deg,#261d17 0%,#211914 100%)}
+header{background:rgba(32,24,19,.97);border-bottom-color:rgba(208,173,122,.18)}
+@media(max-width:900px){nav{background:#261c16}}
+.hero{background:#221914}
+.hero-copy{background:radial-gradient(circle at 15% 17%,rgba(194,154,103,.095),transparent 43%),linear-gradient(125deg,#2c211a 0%,#201813 100%)}
+.hero-image{background:#211914}
+.hero-image:before{background:linear-gradient(90deg,#201813 0%,rgba(32,24,19,.35) 12%,transparent 38%),linear-gradient(0deg,rgba(31,22,17,.2),transparent 40%)}
+.trust-strip{background:linear-gradient(110deg,#32251d 0%,#291f19 52%,#30231c 100%);border-top-color:rgba(194,154,103,.23);border-bottom-color:rgba(194,154,103,.2)}
+.trust-strip .trust-icon{background:rgba(194,154,103,.075)}
+.work-showcase{background:#241b16}
+.work-card{background:#31251e}
+.reviews{background:#362920}
+.services{background:radial-gradient(circle at 90% 8%,rgba(194,154,103,.065),transparent 38%),#291f19}
+.services .simple-booking{background:#33271f;border-color:rgba(206,164,110,.31);box-shadow:0 20px 54px rgba(17,11,7,.22)}
+.booking-preview button{background:#241b16;border-color:rgba(232,210,185,.2)}
+.booking-preview button.selected{background:#493525;border-color:#d0a36b}
+.services .simple-booking .booking-phone-option{background:#292019!important;border-color:#6a503b!important}
+.services .simple-booking-form>input#customer-booking-name{background:#241b16!important;border-color:#78604b!important}
+.services .booking-selection-summary{background:#483628}
+.booking-success{background:#3a2c21}
+.visit-panel{background:radial-gradient(circle at 95% 5%,rgba(194,154,103,.07),transparent 37%),#2d221b}
+footer{background:#201812;border-top-color:rgba(208,173,122,.15)}
+.preview-ticker{background:#292019;border-bottom-color:rgba(208,173,122,.23)}
+@media(max-width:760px){
+ .hero{background:#211914}
+ .hero-copy{background:linear-gradient(90deg,rgba(28,20,15,.93) 0%,rgba(28,20,15,.76) 54%,rgba(28,20,15,.38) 100%),linear-gradient(0deg,rgba(28,20,15,.65),transparent 57%,rgba(28,20,15,.23))}
+}
+@media(max-width:600px){
+ .hero-copy{background:linear-gradient(90deg,rgba(28,20,15,.93) 0%,rgba(28,20,15,.79) 56%,rgba(28,20,15,.44) 100%),linear-gradient(0deg,rgba(28,20,15,.67),transparent 55%,rgba(28,20,15,.25))}
+ .mobile-actions{background:#241a14;border-top-color:rgba(208,173,122,.2)}
+}
+@media(min-width:601px) and (max-width:760px){.mobile-actions{background:#241a14;border-top-color:rgba(208,173,122,.2)}}
