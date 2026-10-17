@@ -369,3 +369,19 @@ button:focus-visible,a:focus-visible{outline:2px solid #e4bc84;outline-offset:3p
   .services .simple-booking-days button{flex-basis:72px}
   .services .simple-booking-times{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
+
+/* Mobile header: subtle booking shortcut, distinct from the fixed footer CTA. */
+.mobile-header-book{display:none}
+@media(max-width:900px){
+ header{grid-template-columns:minmax(0,1fr) auto auto;column-gap:12px}
+ .mobile-header-book{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:0 13px;border:1px solid rgba(197,155,99,.44);border-radius:5px;color:#e5c49a;background:rgba(197,155,99,.065);text-decoration:none;font-size:12px;font-weight:800;letter-spacing:.025em;white-space:nowrap}
+ .mobile-header-book:hover,.mobile-header-book:focus-visible{background:rgba(197,155,99,.14);border-color:#c59b63}
+}
+@media(max-width:600px){
+ header{column-gap:8px}
+ .mobile-header-book{min-height:36px;padding:0 11px;font-size:12px}
+}
+@media(max-width:360px){
+ .mobile-header-book{padding:0 9px;gap:5px}
+ .brand{font-size:13px}
+}
