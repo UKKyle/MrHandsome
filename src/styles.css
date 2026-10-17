@@ -333,3 +333,39 @@ button:focus-visible,a:focus-visible{outline:2px solid #e4bc84;outline-offset:3p
 .trust-strip .trust-primary small{font-size:12px;letter-spacing:0}
 @media(max-width:1000px){.trust-strip .trust-primary strong{font-size:23px}}
 @media(max-width:760px){.trust-strip .trust-primary strong{font-size:24px}}
+
+/* Mobile customer journey: compact booking and consistent section rhythm. Desktop unchanged. */
+@media(max-width:760px){
+  .services{padding:36px 18px 54px}
+  .services-shell{display:block}
+  .services-copy{display:none}
+  .services .simple-booking{margin:0;padding:24px 20px;border-radius:10px}
+  .services .simple-booking .booking-preview-head{padding-bottom:15px}
+  .services .simple-booking .booking-preview-head h3{font-size:clamp(25px,6.3vw,33px);line-height:1.12}
+  .services .simple-booking .booking-phone-option{margin:13px 0 4px!important;padding:12px 14px!important;flex-wrap:wrap!important}
+  .services .simple-booking .simple-booking-label{margin:19px 0 10px;font-size:12px}
+  .services .simple-booking-days{gap:8px;padding-bottom:2px;scrollbar-width:none;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+  .services .simple-booking-days::-webkit-scrollbar{display:none}
+  .services .simple-booking-days button{flex:0 0 75px;min-height:70px;padding:10px 5px;scroll-snap-align:start}
+  .services .simple-booking-times{gap:8px}
+  .services .simple-booking-times button{min-height:48px;padding:12px 6px}
+  .services .simple-booking .simple-booking-form{margin:16px 0 0!important;padding:17px 0 0!important;gap:11px!important}
+  .services .simple-booking-form>input#customer-booking-name{height:48px!important;min-height:48px!important}
+  .services .simple-booking-form .booking-agreement{line-height:1.5!important}
+  .services .simple-booking-form button.booking-submit{min-height:49px!important}
+  .services .booking-privacy{font-size:11px}
+  .work-showcase{padding:52px 0 58px}
+  .reviews{padding:55px 20px 58px}
+  .reviews-head{margin-bottom:28px;gap:20px}
+  .review-wall blockquote{padding:22px 0}
+  .visit-panel{padding:46px 20px}
+  #booking{scroll-margin-top:78px}
+}
+@media(max-width:420px){
+  .services{padding:25px 12px 45px}
+  .services .simple-booking{padding:19px 15px}
+  .services .simple-booking .booking-phone-option{padding:12px!important}
+  .services .simple-booking .booking-phone-option>a{font-size:13px!important}
+  .services .simple-booking-days button{flex-basis:72px}
+  .services .simple-booking-times{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
