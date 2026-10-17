@@ -205,6 +205,11 @@ export default {
   }
   if (!isAdmin) return env.ASSETS.fetch(request);
   if (!await verifyAdmin(request,env)) return denied();
+  if (url.pathname.startsWith('/admin/api/') && !['GET','HEAD','OPTIONS'].includes(request.method)) {
+    const origin=request.headers.get('origin');
+    const fetchSite=request.headers.get('sec-fetch-site');
+    if ((origin&&origin!==url.origin)||(fetchSite&&fetchSite!=='same-origin'&&fetchSite!=='none'))return json({error:'Cross-site administration requests are not permitted.'},403);
+  }
   if (url.pathname.startsWith('/admin/api/')) {
     if (!env.BOOKINGS_DB) return json({error:'Booking database not configured'},503);
     try {return await api(request,env,url);}
