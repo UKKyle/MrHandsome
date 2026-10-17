@@ -9,20 +9,20 @@ const workImage3 = '/images/work-3.webp';
 const workImage4 = '/images/work-4.webp';
 
 const business = {
-  name: 'Mr Handsome',
-  phone: '0121 448 3870',
-  phoneHref: 'tel:+441214483870',
-  address: "25 The Green, King's Norton, Birmingham B38 8SD",
-  rating: 4.9,
-  reviews: 290,
-  facebook: 'https://www.facebook.com/427863107661555/',
-  googleMaps: "https://maps.app.goo.gl/JHg152UBVmizcBJR6",
-  googleEmbed: "https://www.google.com/maps?q=25+The+Green,+King's+Norton,+Birmingham+B38+8SD&output=embed",
+  name: 'Your Barbershop',
+  phone: 'Your shop telephone',
+  phoneHref: '#contact',
+  address: "Your shop address",
+  rating: 0,
+  reviews: 0,
+  facebook: '#contact',
+  googleMaps: "#contact",
+  googleEmbed: "",
   heroImage,
   hours: [
-    ['Monday–Friday', '9:30am – 7:00pm'],
-    ['Saturday', '8:30am – 5:00pm'],
-    ['Sunday', '11:00am – 4:00pm'],
+    ['Monday–Friday', 'Hours to be confirmed'],
+    ['Saturday', 'Hours to be confirmed'],
+    ['Sunday', 'Hours to be confirmed'],
   ],
 };
 
@@ -37,26 +37,26 @@ const services = [
 const workImages = [
   {
     src: workImage1,
-    alt: 'Barber styling a finished haircut at Mr Handsome',
+    alt: 'Barber styling a finished haircut at Your Barbershop',
   },
   {
     src: workImage2,
-    alt: 'Rear fade haircut at Mr Handsome',
+    alt: 'Rear fade haircut at Your Barbershop',
   },
   {
     src: workImage3,
-    alt: 'Fade and beard finish at Mr Handsome',
+    alt: 'Fade and beard finish at Your Barbershop',
   },
   {
     src: workImage4,
-    alt: 'Side-part haircut finished at Mr Handsome',
+    alt: 'Side-part haircut finished at Your Barbershop',
   },
 ];
 
 const reviews = [
-  ['“Always a cracking haircut here.”', 'Dan Craig'],
-  ['“Great place for kids as well.”', 'Robbie Hindle'],
-  ['“The attention to detail is second to none.”', 'Stuart Jennings'],
+  ['“Add a verified review before launch.”', 'Customer review'],
+  ['“Replace with a genuine customer quote.”', 'Customer review'],
+  ['“Only publish attributed, verified reviews.”', 'Customer review'],
 ];
 
 function App() {
@@ -87,7 +87,7 @@ function App() {
   selectionRef.current={date:selectedDate,time:bookingTime};
 
   useEffect(() => {
-    document.title = unlocked ? 'Mr Handsome — Concept Preview' : 'Private Concept — Mr Handsome';
+    document.title = unlocked ? 'Your Barbershop — Concept Preview' : 'Private Concept — Your Barbershop';
   }, [unlocked]);
 
 
@@ -194,9 +194,9 @@ function App() {
     return (
       <main className="gate">
         <section className="gate-panel">
-          <p className="gate-brand">MR HANDSOME</p>
+          <p className="gate-brand">YOUR BARBERSHOP</p>
           <h1>Private website preview</h1>
-          <p>This independent concept has been prepared for Mr Handsome. It is not the live business website.</p>
+          <p>This independent concept has been prepared for Your Barbershop. It is not the live business website.</p>
           <form onSubmit={unlock}>
             <label htmlFor="pin">Preview PIN</label>
             <div className="pin-row">
@@ -213,7 +213,7 @@ function App() {
   return (
     <div className="site">
       <a className="skip-link" href="#booking">Skip to booking</a>
-      <div className="preview-note preview-ticker" role="region" aria-label="Mr Handsome announcements">
+      <div className="preview-note preview-ticker" role="region" aria-label="Your Barbershop announcements">
         <div className="preview-ticker-track" aria-hidden="true">
           {[0,1,2,3].map(i => <div className="preview-ticker-set" key={i}>
             <span>BOOKINGS AVAILABLE</span><span className="ticker-dot">✦</span>
@@ -225,7 +225,7 @@ function App() {
       </div>
 
       <header>
-        <button className="brand" onClick={() => go('top')}>MR HANDSOME</button>
+        <button className="brand" onClick={() => go('top')}>YOUR BARBERSHOP</button>
         <nav className={menuOpen ? 'open' : ''}>
           <button onClick={() => go('work')}>Gallery</button>
           <button onClick={() => go('booking')}>Availability</button>
@@ -258,12 +258,12 @@ function App() {
           </div>
 
           <figure className="hero-image">
-            <img src={business.heroImage} alt="Hair styling at Mr Handsome barbershop" />
+            <img src={business.heroImage} alt="Hair styling at Your Barbershop barbershop" />
           </figure>
         </section>
 
-        <section className="trust-strip" aria-label="Why visit Mr Handsome">
-          <a className="trust-item trust-reviews" href={business.googleMaps} target="_blank" rel="noopener noreferrer" aria-label={`Find Mr Handsome on Google Maps. Rating ${business.rating} out of 5 from ${business.reviews} Google reviews`}>
+        <section className="trust-strip" aria-label="Why visit Your Barbershop">
+          <a className="trust-item trust-reviews" href={business.googleMaps} target="_blank" rel="noopener noreferrer" aria-label={`Find Your Barbershop on Google Maps. Rating ${business.rating} out of 5 from ${business.reviews} Google reviews`}>
             <span className="trust-icon trust-google" aria-hidden="true">G</span>
             <span className="trust-copy">
               <span className="trust-primary"><strong>{business.rating}<small>/5</small></strong><span className="trust-stars" aria-label="Five stars">{[0,1,2,3,4].map(i => <Star key={i} size={15} fill="currentColor" />)}</span></span>
@@ -350,7 +350,7 @@ function App() {
               <div className="booking-preview-head">
                 <div><h3>Choose your appointment.</h3></div>
               </div>
-              <div className="booking-phone-option"><span>Prefer to book by phone?</span><a href={business.phoneHref} aria-label={`Call Mr Handsome on ${business.phone}`}><Phone size={16}/> <span>{business.phone}</span></a></div>
+              <div className="booking-phone-option"><span>Prefer to book by phone?</span><a href={business.phoneHref} aria-label={`Call Your Barbershop on ${business.phone}`}><Phone size={16}/> <span>{business.phone}</span></a></div>
               {!bookingConfirmation && (!slotsLoaded ? <p className="simple-booking-empty">Checking upcoming availability…</p> :
                 bookingDates.length===0 ? <div className="simple-booking-empty">
                   <CalendarDays size={27}/><p>No appointment times have been published yet.</p>
@@ -400,7 +400,7 @@ function App() {
 
         <section className="visit" id="visit">
           <div className="map-wrap">
-            <iframe title="Mr Handsome location" src={business.googleEmbed} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+            <iframe title="Your Barbershop location" src={business.googleEmbed} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
           </div>
 
           <div className="visit-panel">
@@ -421,14 +421,14 @@ function App() {
       </main>
 
       <footer>
-        <strong>MR HANDSOME</strong>
-        <span>25 The Green · King’s Norton · Birmingham B38 8SD</span>
+        <strong>YOUR BARBERSHOP</strong>
+        <span>Your shop address</span>
         <div className="footer-links"><a href={business.phoneHref}>Call {business.phone}</a><a href={business.googleMaps} target="_blank" rel="noreferrer">Directions</a><a href={business.facebook} target="_blank" rel="noreferrer">Facebook</a></div>
       </footer>
 
       {termsOpen && <div className="terms-backdrop" onMouseDown={event=>{if(event.target===event.currentTarget)setTermsOpen(false);}}>
         <div className="terms-dialog" role="dialog" aria-modal="true" aria-labelledby="terms-heading">
-          <div className="terms-dialog-head"><div><span className="terms-eyebrow">MR HANDSOME · APPOINTMENTS</span><h2 id="terms-heading">Terms &amp; Conditions</h2></div><button type="button" className="terms-close" onClick={()=>setTermsOpen(false)} aria-label="Close terms">×</button></div>
+          <div className="terms-dialog-head"><div><span className="terms-eyebrow">YOUR BARBERSHOP · APPOINTMENTS</span><h2 id="terms-heading">Terms &amp; Conditions</h2></div><button type="button" className="terms-close" onClick={()=>setTermsOpen(false)} aria-label="Close terms">×</button></div>
           <div className="terms-dialog-body">
             <h3>Arriving for your appointment</h3><p>Please arrive at your selected time. If you arrive late or miss your appointment, the barber may be unable to complete your service and may ask you to wait for the next available walk-in opportunity.</p>
             <h3>Changing or cancelling</h3><p>If you need to change or cancel your appointment, please telephone the shop on <a href={business.phoneHref}>{business.phone}</a> as soon as possible. Online changes and cancellations are not currently offered.</p>
@@ -444,7 +444,7 @@ function App() {
           <h2 id="booking-confirmed-title">{previewOnly?'Booking preview complete':"You're booked in."}</h2>
           <p className="booking-modal-name">{bookingConfirmation.name}</p>
           <p className="booking-modal-time">{new Date(bookingConfirmation.date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} at {bookingConfirmation.time}</p>
-          <p className="booking-modal-address">Mr Handsome · 25 The Green, King's Norton</p>
+          <p className="booking-modal-address">Your Barbershop · Your shop address</p>
           <p className="booking-modal-note">{previewOnly?'PREVIEW ONLY — This demonstrates the confirmation customers would see after booking. No appointment has been reserved and no email has been sent.':emailBooking?(bookingConfirmation.emailSent?'A confirmation email is on its way. Please also keep these details.':'Your booking is confirmed, but the email could not be sent. Please save these details.'):'Your appointment is confirmed. No text or email will be sent, so save these details.'}</p>
           <button className="booking-modal-dismiss" onClick={()=>setConfirmationOpen(false)}>Done</button>
         </div>
