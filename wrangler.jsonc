@@ -11,7 +11,8 @@
       "/admin/*",
       "/api/admin/*",
       "/api/slots",
-      "/api/bookings"
+      "/api/bookings",
+      "/api/booking-config"
     ]
   },
   "main": "./worker/index.ts",
