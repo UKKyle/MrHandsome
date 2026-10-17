@@ -271,6 +271,37 @@ function App() {
           </div>
         </section>
 
+        <section className="reviews" id="reviews">
+          <div className="reviews-head">
+            <div>
+              <p className="section-kicker">Customer reviews</p>
+              <h2>A reputation already earned.</h2>
+            </div>
+            <div className="review-score">
+              <strong>{business.rating}</strong>
+              <div>
+                <div className="stars">{[0,1,2,3,4].map(i => <Star key={i} size={18} fill="currentColor" />)}</div>
+                <span>{business.reviews} Google reviews</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="review-wall">
+            {reviews.map(([quote, name], index) => (
+              <blockquote className={index === 0 ? 'review-featured' : ''} key={name}>
+                <div className="quote-stars">{[0,1,2,3,4].map(i => <Star key={i} size={13} fill="currentColor" />)}</div>
+                <p>{quote}</p>
+                <cite>{name}<span>Google review</span></cite>
+              </blockquote>
+            ))}
+          </div>
+
+          <div className="reviews-cta">
+            <span>Read more customer feedback</span>
+            <a href={business.googleMaps} target="_blank" rel="noreferrer">View Google profile</a>
+          </div>
+        </section>
+
         <section className="services" id="services">
           <div className="services-shell">
             <div className="services-copy">
@@ -321,37 +352,6 @@ function App() {
               </form>}
 
             </div>
-          </div>
-        </section>
-
-        <section className="reviews" id="reviews">
-          <div className="reviews-head">
-            <div>
-              <p className="section-kicker">Customer reviews</p>
-              <h2>A reputation already earned.</h2>
-            </div>
-            <div className="review-score">
-              <strong>{business.rating}</strong>
-              <div>
-                <div className="stars">{[0,1,2,3,4].map(i => <Star key={i} size={18} fill="currentColor" />)}</div>
-                <span>{business.reviews} Google reviews</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="review-wall">
-            {reviews.map(([quote, name], index) => (
-              <blockquote className={index === 0 ? 'review-featured' : ''} key={name}>
-                <div className="quote-stars">{[0,1,2,3,4].map(i => <Star key={i} size={13} fill="currentColor" />)}</div>
-                <p>{quote}</p>
-                <cite>{name}<span>Google review</span></cite>
-              </blockquote>
-            ))}
-          </div>
-
-          <div className="reviews-cta">
-            <span>Read more customer feedback</span>
-            <a href={business.googleMaps} target="_blank" rel="noreferrer">View Google profile</a>
           </div>
         </section>
 
