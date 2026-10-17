@@ -72,6 +72,7 @@ function App() {
   const [acceptedArrivalTerms, setAcceptedArrivalTerms] = useState(false);
   const [customerEmail,setCustomerEmail] = useState('');
   const [emailBooking,setEmailBooking] = useState(false);
+  const [previewOnly,setPreviewOnly] = useState(true);
   const [turnstileKey,setTurnstileKey] = useState('');
   const [turnstileToken,setTurnstileToken] = useState('');
   const turnstileContainer=React.useRef<HTMLDivElement>(null);
@@ -140,6 +141,7 @@ function App() {
     let active=true;
     fetch('/api/booking-config',{cache:'no-store'}).then(r=>r.json()).then((v:{emailEnabled?:boolean;turnstileSiteKey?:string})=>{
       if(!active)return;
+      setPreviewOnly(v.previewOnly!==false);
       setEmailBooking(v.emailEnabled===true);
       setTurnstileKey(v.emailEnabled&&v.turnstileSiteKey?v.turnstileSiteKey:'');
     }).catch(()=>{});
@@ -162,7 +164,8 @@ function App() {
 
   const confirmBooking = async (event:FormEvent) => {
     event.preventDefault();
-    if(!selectedDate || !bookingTime || !acceptedArrivalTerms || customerName.trim().length<2 || (emailBooking && (!customerEmail.includes('@') || !turnstileToken))) return;
+    if(!selectedDate || !bookingTime || !acceptedArrivalTerms || customerName.trim().length<2 || (previewOnly && !customerEmail.includes('@')) || (!previewOnly && emailBooking && (!customerEmail.includes('@') || !turnstileToken))) return;
+    if(previewOnly){setBookingConfirmation({date:selectedDate!,time:bookingTime!,name:customerName.trim()});setConfirmationOpen(true);return;}
     setBookingSubmitting(true);setBookingError('');
     try {
       const res=await fetch('/api/bookings',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({date:selectedDate,time:bookingTime,name:customerName.trim(),accepted_terms:true,...(emailBooking?{email:customerEmail.trim(),turnstile_token:turnstileToken}:{})})});
@@ -375,19 +378,19 @@ function App() {
                 {bookingTime && selectedDate && <div className="booking-selection-summary"><span>Your appointment</span><strong>{new Date(selectedDate+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long'})} · {bookingTime}</strong></div>}
                 <label htmlFor="customer-booking-name">Your name</label>
                 <input id="customer-booking-name" value={customerName} onChange={e=>setCustomerName(e.target.value)} placeholder="Full name" autoComplete="name" maxLength={80} minLength={2} required/>
-                {emailBooking && <>
+                {(previewOnly||emailBooking) && <>
                   <label htmlFor="customer-booking-email">Email address</label>
                   <input id="customer-booking-email" className="booking-email-input" type="email" value={customerEmail} onChange={e=>setCustomerEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" maxLength={254} required/>
-                  <p className="booking-email-hint">We'll email your appointment details here. No account needed.</p>
-                  <div className="booking-turnstile" ref={turnstileContainer} aria-label="Booking security verification"/>
+                  <p className="booking-email-hint">{previewOnly?'Demo only — no email is sent or stored. In the live version, confirmation details are emailed here.':"We'll email your appointment details here. No account needed."}</p>
+                  {!previewOnly && <div className="booking-turnstile" ref={turnstileContainer} aria-label="Booking security verification"/>}
                 </>}
                 <label className="booking-agreement">
                   <input type="checkbox" checked={acceptedArrivalTerms} onChange={e=>setAcceptedArrivalTerms(e.target.checked)} required/>
                   <span>I understand that if I arrive late or miss my appointment, the barber may be unable to complete my service and may ask me to wait for the next available walk-in opportunity.</span>
                 </label>
                 {bookingError&&<p className="booking-form-error" role="alert">{bookingError}</p>}
-                <button className="booking-submit" type="submit" disabled={!bookingTime||!acceptedArrivalTerms||customerName.trim().length<2||(emailBooking&&(!customerEmail.includes('@')||!turnstileToken))||bookingSubmitting}>{bookingSubmitting?'Booking…':'Confirm appointment'}</button>
-                <p className="booking-privacy">Your name and appointment are stored so the shop can manage your booking. To ask about your information or cancel, call <a href={business.phoneHref}>{business.phone}</a>. {emailBooking?'A confirmation email will be sent if delivery is available.':'No email or SMS is sent.'}</p>
+                <button className="booking-submit" type="submit" disabled={!bookingTime||!acceptedArrivalTerms||customerName.trim().length<2||(previewOnly&&!customerEmail.includes('@'))||(!previewOnly&&emailBooking&&(!customerEmail.includes('@')||!turnstileToken))||bookingSubmitting}>{bookingSubmitting?'Booking…':previewOnly?'Preview confirmation':'Confirm appointment'}</button>
+                <p className="booking-privacy">{previewOnly?'Preview only. No appointment is created and your details are not submitted.':'Your name and appointment are stored so the shop can manage your booking.'} To ask about your information or cancel, call <a href={business.phoneHref}>{business.phone}</a>. {previewOnly?'':emailBooking?'A confirmation email will be sent if delivery is available.':'No email or SMS is sent.'}</p>
               </form>}
 
             </div>
@@ -423,12 +426,12 @@ function App() {
 
       {bookingConfirmation && confirmationOpen && <div className="booking-modal-backdrop" onMouseDown={event=>{if(event.target===event.currentTarget)setConfirmationOpen(false);}}>
         <div className="booking-modal" role="dialog" aria-modal="true" aria-labelledby="booking-confirmed-title" tabIndex={-1} ref={confirmationDialogRef}>
-          <div className="booking-modal-check" aria-hidden="true">✓</div>
-          <h2 id="booking-confirmed-title">You're booked in.</h2>
+          <div className="booking-modal-check" aria-hidden="true">{previewOnly?'i':'✓'}</div>
+          <h2 id="booking-confirmed-title">{previewOnly?'PREVIEW ONLY':"You're booked in."}</h2>
           <p className="booking-modal-name">{bookingConfirmation.name}</p>
           <p className="booking-modal-time">{new Date(bookingConfirmation.date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} at {bookingConfirmation.time}</p>
           <p className="booking-modal-address">Mr Handsome · 25 The Green, King's Norton</p>
-          <p className="booking-modal-note">{emailBooking?(bookingConfirmation.emailSent?'A confirmation email is on its way. Please also keep these details.':'Your booking is confirmed, but the email could not be sent. Please save these details.'):'Your appointment is confirmed. No text or email will be sent, so save these details.'}</p>
+          <p className="booking-modal-note">{previewOnly?'This is a demonstration of the booking experience. No appointment has been made and no email has been sent.':emailBooking?(bookingConfirmation.emailSent?'A confirmation email is on its way. Please also keep these details.':'Your booking is confirmed, but the email could not be sent. Please save these details.'):'Your appointment is confirmed. No text or email will be sent, so save these details.'}</p>
           <button className="booking-modal-dismiss" onClick={()=>setConfirmationOpen(false)}>Done</button>
         </div>
       </div>}
