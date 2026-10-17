@@ -1,27 +1,12 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "mr-handsome-site",
+  "name": "barbershop-base-preview",
   "compatibility_date": "2026-10-13",
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application",
     "binding": "ASSETS",
-    "run_worker_first": [
-      "/admin",
-      "/admin/*",
-      "/api/admin/*",
-      "/api/slots",
-      "/api/bookings",
-      "/api/booking-config"
-    ]
+    "run_worker_first": ["/admin", "/admin/*", "/api/slots", "/api/bookings", "/api/booking-config"]
   },
-  "main": "./worker/index.ts",
-  "d1_databases": [
-    {
-      "binding": "BOOKINGS_DB",
-      "database_name": "mr-handsome-bookings",
-      "database_id": "dab69d51-a07c-47a6-9e2f-d7e796a32906",
-      "jurisdiction": "eu"
-    }
-  ]
+  "main": "./worker/index.ts"
 }
