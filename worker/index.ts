@@ -70,7 +70,7 @@ async function getSlots(env:Env,includeBlocked:boolean) {
   const end=all.at(-1)?.date??date;
   const [r,bookings]=await Promise.all([
     env.BOOKINGS_DB.prepare('SELECT date,time FROM blocked_slots WHERE date>=? AND date<=?').bind(date,end).all(),
-    env.BOOKINGS_DB.prepare('SELECT date,time,customer_name FROM simple_bookings WHERE date>=? AND date<=?').bind(date,end).all()
+    env.BOOKINGS_DB.prepare('SELECT date,time,customer_name,assigned_barber FROM simple_bookings WHERE date>=? AND date<=?').bind(date,end).all()
   ]);
   const blockedRecords=r.results as {date:string;time:string}[];
   // A 30-minute legacy block anywhere inside an hour also blocks that hour.
@@ -79,8 +79,8 @@ async function getSlots(env:Env,includeBlocked:boolean) {
     (Number(row.time.slice(0,2))*60+Number(row.time.slice(3,5))) <
     (Number(slot.time.slice(0,2))*60+Number(slot.time.slice(3,5))+60)
   );
-  const reservations=new Map((bookings.results as {date:string;time:string;customer_name:string}[]).map(x=>[x.date+'|'+x.time,x.customer_name]));
-  return all.filter(x=>includeBlocked||(!isBlocked(x)&&!reservations.has(x.date+'|'+x.time))).map(x=>({...x,blocked:isBlocked(x),booked:reservations.has(x.date+'|'+x.time),customer_name:includeBlocked?(reservations.get(x.date+'|'+x.time)??null):undefined}));
+  const reservations=new Map((bookings.results as {date:string;time:string;customer_name:string;assigned_barber:string|null}[]).map(x=>[x.date+'|'+x.time,x]));
+  return all.filter(x=>includeBlocked||(!isBlocked(x)&&!reservations.has(x.date+'|'+x.time))).map(x=>({...x,blocked:isBlocked(x),booked:reservations.has(x.date+'|'+x.time),customer_name:includeBlocked?(reservations.get(x.date+'|'+x.time)?.customer_name??null):undefined,assigned_barber:includeBlocked?(reservations.get(x.date+'|'+x.time)?.assigned_barber??null):undefined}));
 }
 
 const emailEnabled=(env:Env)=>Boolean(env.RESEND_API_KEY&&env.BOOKING_FROM_EMAIL&&env.TURNSTILE_SITE_KEY&&env.TURNSTILE_SECRET_KEY);
@@ -104,6 +104,15 @@ async function sendConfirmation(env:Env,email:string,name:string,date:string,tim
 async function api(request:Request,env:Env,url:URL):Promise<Response> {
   const path=url.pathname,method=request.method;
   if (method==='GET' && path==='/admin/api/slots') return json({slots:await getSlots(env,true)});
+  if (method==='PATCH' && path==='/admin/api/bookings/barber') {
+    const b=await body(request);
+    if(typeof b.date!=='string'||typeof b.time!=='string'||!/^\\d{4}-\\d{2}-\\d{2}$/.test(b.date)||!validTime(b.time))return json({error:'Invalid appointment'},400);
+    const barber=typeof b.barber==='string'?b.barber.trim():'';
+    if(barber.length>70||/[<>\\x00-\\x1f]/.test(barber))return json({error:'Invalid barber name'},400);
+    const result=await env.BOOKINGS_DB.prepare('UPDATE simple_bookings SET assigned_barber=? WHERE date=? AND time=?').bind(barber||null,b.date,b.time).run();
+    if(!result.meta.changes)return json({error:'Appointment not found'},404);
+    return json({ok:true});
+  }
   if (method==='DELETE' && path==='/admin/api/bookings') {
     const b=await body(request);
     if(typeof b.date!=='string'||typeof b.time!=='string')return json({error:'Invalid reservation'},400);
