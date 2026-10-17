@@ -470,7 +470,5 @@ footer{background:#201812;border-top-color:rgba(208,173,122,.15)}
 .booking-modal-time{margin:0;color:#f6e9d9;font-size:18px;line-height:1.45;font-weight:700}
 .booking-modal-address{margin:10px 0 0;color:#cbb9a7;font-size:12px}
 .booking-modal-note{margin:24px 0;color:#bdad9c;font-size:12px;line-height:1.6}
-.booking-modal-calendar{display:flex;justify-content:center;align-items:center;gap:9px;min-height:52px;padding:12px 18px;border-radius:7px;background:#c29a67;color:#241911;text-decoration:none;font-size:14px;font-weight:800}
-.booking-modal-calendar:hover{background:#d4aa74}
 .booking-modal-dismiss{display:block;width:100%;margin-top:10px;min-height:46px;border:1px solid rgba(234,207,174,.35);border-radius:7px;background:transparent;color:#efddc8;font-size:13px;font-weight:750}
 @media(max-width:600px){.booking-modal-backdrop{padding:16px 16px max(16px,env(safe-area-inset-bottom))}.booking-modal{padding:29px 22px 22px}.booking-modal h2{margin-bottom:18px}}
