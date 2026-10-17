@@ -20,7 +20,8 @@ function setMode(next){mode=next;for(const n of ['bookings','availability','audi
 e('nav-bookings').onclick=()=>setMode('bookings');e('nav-availability').onclick=()=>setMode('availability');e('nav-audit').onclick=()=>setMode('audit');
 const activityNames={new_booking:'New booking received',assign_barber:'Barber assignment updated',cancel_booking:'Appointment cancelled',block_slot:'Time marked unavailable',unblock_slot:'Time reopened'};
 async function loadAudit(){
- const container=e('audit-events');container.replaceChildren();const loading=document.createElement('p');loading.className='empty';loading.textContent='Loading activity…';container.append(loading);
+ const container=e('audit-events');container.replaceChildren();
+ if(demoMode){const message=document.createElement('p');message.className='empty';message.textContent='PREVIEW ONLY · Administrator activity is hidden in demo mode. Switch to live admin data to view the protected log.';container.append(message);return;}const loading=document.createElement('p');loading.className='empty';loading.textContent='Loading activity…';container.append(loading);
  try{const data=await request('GET','audit');container.replaceChildren();if(!data.events?.length){const empty=document.createElement('p');empty.className='empty';empty.textContent='No administrator activity recorded yet.';container.append(empty);return;}
  for(const record of data.events){
  const item=document.createElement('article');item.className='audit-item';
@@ -49,7 +50,7 @@ function visibleSlots(){
    return {...slot,booked:example,blocked:false,customer_name:example?names[count-1]:null,assigned_barber:example&&count===1?'Demo barber':null,sample:true};
  });
 }
-e('demo-toggle').onclick=()=>{demoMode=!demoMode;e('demo-description').textContent=demoMode?'Demo schedule · sample customers only':'Live admin data · restricted access';e('demo-toggle').textContent=demoMode?'Switch to live admin data':'Return to demo schedule';render();};
+e('demo-toggle').onclick=()=>{demoMode=!demoMode;e('demo-description').textContent=demoMode?'Demo schedule · sample customers only':'Live admin data · restricted access';e('demo-toggle').textContent=demoMode?'Switch to live admin data':'Return to demo schedule';if(mode==='audit')loadAudit();else render();};
 function render(){
  const view=visibleSlots();
  const dates=[...new Set(view.map(s=>s.date))];if(!dates.includes(day))day=dates[0]||today;
