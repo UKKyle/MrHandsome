@@ -390,7 +390,7 @@ function App() {
                 </label>
                 {bookingError&&<p className="booking-form-error" role="alert">{bookingError}</p>}
                 <button className="booking-submit" type="submit" disabled={!bookingTime||!acceptedArrivalTerms||customerName.trim().length<2||(previewOnly&&!customerEmail.includes('@'))||(!previewOnly&&emailBooking&&(!customerEmail.includes('@')||!turnstileToken))||bookingSubmitting}>{bookingSubmitting?'Booking…':previewOnly?'Preview confirmation':'Confirm appointment'}</button>
-                <p className="booking-privacy">{previewOnly?'Preview only. No appointment is created and your details are not submitted.':'Your name and appointment are stored so the shop can manage your booking.'} To ask about your information or cancel, call <a href={business.phoneHref}>{business.phone}</a>. {previewOnly?'':emailBooking?'A confirmation email will be sent if delivery is available.':'No email or SMS is sent.'}</p>
+                <p className="booking-privacy">{previewOnly?'Concept preview only. No reservation is created, and the name or email entered here is not sent to the booking server.':<>Your booking details are stored so the shop can manage your appointment. To ask about your information or cancel, call <a href={business.phoneHref}>{business.phone}</a>. {emailBooking?'We will attempt to send an email confirmation.':'No email or SMS is sent.'}</>}</p>
               </form>}
 
             </div>
