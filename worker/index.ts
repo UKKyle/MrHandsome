@@ -19,19 +19,19 @@ const denied = () => json({error:'Administrator access is not configured or auth
 const validId = (s:unknown):s is string => typeof s==='string' && /^[a-z0-9][a-z0-9_-]{1,63}$/.test(s);
 const validTime = (s:unknown):s is string => typeof s==='string' && /^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(s);
 const stringField = (s:unknown,max=80):s is string => typeof s==='string' && s.trim().length>0 && s.trim().length<=max;
-async function verifyAdmin(request:Request, env:Env):Promise<boolean> {
-  if (!env.ACCESS_TEAM_DOMAIN || !env.ACCESS_AUD || !env.ADMIN_EMAILS) return false;
+async function verifyAdmin(request:Request, env:Env):Promise<string|null> {
+  if (!env.ACCESS_TEAM_DOMAIN || !env.ACCESS_AUD || !env.ADMIN_EMAILS) return null;
   const allowed=env.ADMIN_EMAILS.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
-  if (!allowed.length) return false;
+  if (!allowed.length) return null;
   const token=request.headers.get('cf-access-jwt-assertion');
-  if (!token) return false;
+  if (!token) return null;
   try {
     const issuer=env.ACCESS_TEAM_DOMAIN.replace(/\/$/,'');
-    if (!/^https:\/\/[^/]+\.cloudflareaccess\.com$/.test(issuer)) return false;
+    if (!/^https:\/\/[^/]+\.cloudflareaccess\.com$/.test(issuer)) return null;
     const jwks=createRemoteJWKSet(new URL(issuer+'/cdn-cgi/access/certs'));
     const {payload}=await jwtVerify(token,jwks,{issuer,audience:env.ACCESS_AUD});
-    return typeof payload.email==='string' && allowed.includes(payload.email.toLowerCase());
-  } catch { return false; }
+    return typeof payload.email==='string' && allowed.includes(payload.email.toLowerCase()) ? payload.email.toLowerCase() : null;
+  } catch { return null; }
 }
 async function body(request:Request):Promise<Record<string,unknown>> {
   if (Number(request.headers.get('content-length')||0)>8192) throw new Error('Request is too large');
@@ -101,7 +101,11 @@ async function sendConfirmation(env:Env,email:string,name:string,date:string,tim
  const res=await fetch('https://api.resend.com/emails',{method:'POST',headers:{Authorization:'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({from:env.BOOKING_FROM_EMAIL,to:[email],subject:'Your Mr Handsome appointment — '+pretty,html})});
  return res.ok;
 }
-async function api(request:Request,env:Env,url:URL):Promise<Response> {
+async function audit(env:Env,actor:string,action:string,target:string,details:Record<string,unknown>={}) {
+  await env.BOOKINGS_DB.prepare('INSERT INTO admin_audit_log(id,actor_email,action,target,details) VALUES(?,?,?,?,?)')
+    .bind(crypto.randomUUID(),actor,action,target,JSON.stringify(details)).run();
+}
+async function api(request:Request,env:Env,url:URL,actor:string):Promise<Response> {
   const path=url.pathname,method=request.method;
   if (method==='GET' && path==='/admin/api/slots') return json({slots:await getSlots(env,true)});
   if (method==='PATCH' && path==='/admin/api/bookings/barber') {
@@ -111,12 +115,14 @@ async function api(request:Request,env:Env,url:URL):Promise<Response> {
     if(barber.length>70||/[<>\x00-\x1f]/.test(barber))return json({error:'Invalid barber name'},400);
     const result=await env.BOOKINGS_DB.prepare('UPDATE simple_bookings SET assigned_barber=? WHERE date=? AND time=?').bind(barber||null,b.date,b.time).run();
     if(!result.meta.changes)return json({error:'Appointment not found'},404);
+    await audit(env,actor,'assign_barber',b.date+' '+b.time,{assigned:barber||null});
     return json({ok:true});
   }
   if (method==='DELETE' && path==='/admin/api/bookings') {
     const b=await body(request);
     if(typeof b.date!=='string'||typeof b.time!=='string')return json({error:'Invalid reservation'},400);
-    await env.BOOKINGS_DB.prepare('DELETE FROM simple_bookings WHERE date=? AND time=?').bind(b.date,b.time).run();
+    const deleted=await env.BOOKINGS_DB.prepare('DELETE FROM simple_bookings WHERE date=? AND time=?').bind(b.date,b.time).run();
+    if(deleted.meta.changes)await audit(env,actor,'cancel_booking',b.date+' '+b.time);
     return json({ok:true});
   }
   if (method==='POST' && path==='/admin/api/slots') {
@@ -131,6 +137,7 @@ async function api(request:Request,env:Env,url:URL):Promise<Response> {
       const end=`${String(Math.floor(start/60)).padStart(2,'0')}:${String(start%60).padStart(2,'0')}`;
       await env.BOOKINGS_DB.prepare('DELETE FROM blocked_slots WHERE date=? AND time>=? AND time<?').bind(b.date,b.time,end).run();
     }
+    await audit(env,actor,b.blocked?'block_slot':'unblock_slot',b.date+' '+b.time);
     return json({ok:true});
   }
   if (method==='GET' && path==='/admin/api/overview') {
@@ -204,7 +211,8 @@ export default {
     } catch {return json({error:'This time could not be booked. Refresh availability and try again.'},409);}
   }
   if (!isAdmin) return env.ASSETS.fetch(request);
-  if (!await verifyAdmin(request,env)) return denied();
+  const actor=await verifyAdmin(request,env);
+  if (!actor) return denied();
   if (url.pathname.startsWith('/admin/api/') && !['GET','HEAD','OPTIONS'].includes(request.method)) {
     const origin=request.headers.get('origin');
     const fetchSite=request.headers.get('sec-fetch-site');
@@ -212,11 +220,18 @@ export default {
   }
   if (url.pathname.startsWith('/admin/api/')) {
     if (!env.BOOKINGS_DB) return json({error:'Booking database not configured'},503);
-    try {return await api(request,env,url);}
+    try {return await api(request,env,url,actor);}
     catch(e) {return json({error:'Unable to save changes. Check for duplicate IDs or invalid references.'},400);}
   }
   const assetPath=url.pathname==='/admin' ? '/admin/' : url.pathname;
   const assetUrl=new URL(request.url);assetUrl.pathname=assetPath;
-  return env.ASSETS.fetch(new Request(assetUrl,request));
+  const response=await env.ASSETS.fetch(new Request(assetUrl,request));
+  const headers=new Headers(response.headers);
+  headers.set('Cache-Control','no-store, private');
+  headers.set('X-Content-Type-Options','nosniff');
+  headers.set('Referrer-Policy','no-referrer');
+  headers.set('X-Frame-Options','DENY');
+  headers.set('Content-Security-Policy',\"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; form-action 'self'; base-uri 'none'; frame-ancestors 'none'\");
+  return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
  }
 };
