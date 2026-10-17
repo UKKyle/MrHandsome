@@ -109,8 +109,19 @@ async function audit(env:Env,actor:string,action:string,target:string,details:Re
 async function api(request:Request,env:Env,url:URL,actor:string):Promise<Response> {
   const path=url.pathname,method=request.method;
   if (method==='GET' && path==='/admin/api/audit') {
-    const records=await env.BOOKINGS_DB.prepare('SELECT occurred_at,actor_email,action,target,details FROM admin_audit_log ORDER BY occurred_at DESC,id DESC LIMIT 100').all();
-    return json({events:records.results});
+    const selected=url.searchParams.get('date')||londonParts(new Date()).date;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(selected))return json({error:'Invalid activity date'},400);
+    const today=londonParts(new Date()).date;
+    const offset=(Date.parse(today+'T12:00:00Z')-Date.parse(selected+'T12:00:00Z'))/86400000;
+    if(!Number.isInteger(offset)||offset<0||offset>7)return json({error:'Activity is available for today and the previous seven days'},400);
+    // Retrieve adjacent UTC days so UK daylight-saving transitions are handled correctly.
+    const records=await env.BOOKINGS_DB.prepare("SELECT occurred_at,actor_email,action,target,details FROM admin_audit_log WHERE occurred_at>=datetime(?,'-1 day') AND occurred_at<datetime(?,'+2 day') ORDER BY occurred_at DESC,id DESC LIMIT 500").bind(selected,selected).all();
+    const events=(records.results as {occurred_at:string}[]).filter(record=>{
+      const utcDate=new Date(record.occurred_at.replace(' ','T')+'Z');
+      const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/London',year:'numeric',month:'2-digit',day:'2-digit'}).format(utcDate);
+      return parts===selected;
+    });
+    return json({events});
   }
   if (method==='GET' && path==='/admin/api/slots') return json({slots:await getSlots(env,true)});
   if (method==='PATCH' && path==='/admin/api/bookings/barber') {
