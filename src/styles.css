@@ -495,3 +495,23 @@ footer{background:#201812;border-top-color:rgba(208,173,122,.15)}
 /* Discreet disclosure for details awaiting owner confirmation. */
 .visit-panel .preview-detail-note{margin:15px 0 0;color:#bea892;font-size:11px;line-height:1.55;max-width:380px}
 @media(max-width:600px){.visit-panel .preview-detail-note{font-size:11px;margin-top:14px}}
+
+/* Compact appointment terms with a dedicated, readable dialog. */
+.terms-agreement{display:flex!important;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:4px 5px}
+.terms-agreement label{display:inline-flex!important;align-items:center;gap:9px;margin:0!important;cursor:pointer;line-height:1.55}
+.terms-agreement label input{flex:none}
+.terms-agreement .terms-link{appearance:none;background:none;border:0;padding:0;color:#dbb887;text-decoration:underline;text-underline-offset:3px;font:inherit;font-weight:700;cursor:pointer}
+.terms-agreement .terms-link:hover{color:#f2d5ac}
+.terms-agreement .terms-link:focus-visible,.terms-close:focus-visible,.terms-done:focus-visible{outline:2px solid #d7b786;outline-offset:3px}
+.terms-backdrop{position:fixed;inset:0;z-index:110;display:grid;place-items:center;padding:20px;background:rgba(12,10,9,.78);backdrop-filter:blur(5px)}
+.terms-dialog{width:min(540px,100%);max-height:min(740px,calc(100dvh - 40px));display:flex;flex-direction:column;background:#241b16;border:1px solid #6f5744;border-radius:12px;color:#f0e6d9;box-shadow:0 28px 90px #0009;overflow:hidden}
+.terms-dialog-head{padding:25px 27px 18px;display:flex;justify-content:space-between;align-items:flex-start;gap:15px;border-bottom:1px solid #514032}
+.terms-eyebrow{color:#bfa17d;font-size:10px;letter-spacing:.14em;font-weight:800}
+.terms-dialog h2{font-family:Georgia,serif;font-weight:400;font-size:30px;line-height:1.16;margin:9px 0 0}
+.terms-close{border:1px solid #65503f;background:transparent;color:#ead9c5;border-radius:7px;width:34px;height:34px;font-size:25px;line-height:1}
+.terms-dialog-body{padding:12px 27px 24px;overflow-y:auto;overscroll-behavior:contain}
+.terms-dialog-body h3{margin:19px 0 8px;font-size:14px;font-weight:750;color:#e6cfad}
+.terms-dialog-body p{margin:0;color:#c7b9a9;font-size:13px;line-height:1.72}
+.terms-dialog-body a{color:#ead0a8}
+.terms-done{margin:0 27px 24px;min-height:44px;flex:none;border:1px solid #b99569;background:#bd996d;border-radius:7px;color:#211710;font-weight:800}
+@media(max-width:600px){.terms-backdrop{padding:12px}.terms-dialog{max-height:calc(100dvh - 24px)}.terms-dialog-head{padding:22px 20px 17px}.terms-dialog-body{padding:12px 20px 22px}.terms-done{margin:0 20px 20px}}
